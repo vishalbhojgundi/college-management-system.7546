@@ -9,28 +9,36 @@
 
 <head>
 
-    <title>Manage Staff</title>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Staff Management | Sunrise College</title>
 
     <link rel="stylesheet"
           href="${pageContext.request.contextPath}/css/style.css">
 
+    <script src="${pageContext.request.contextPath}/js/script.js"
+            defer></script>
+
 </head>
+
 
 <body>
 
 
 <%
     User admin =
-            (session != null)
-            ? (User) session.getAttribute("user")
-            : null;
+        (session != null)
+        ? (User) session.getAttribute("user")
+        : null;
 
     if (admin == null ||
         !"ADMIN".equals(admin.getRole())) {
 
         response.sendRedirect(
-                request.getContextPath() +
-                "/login.jsp"
+            request.getContextPath() + "/login.jsp"
         );
 
         return;
@@ -38,19 +46,20 @@
 
 
     List<User> staffList =
-            (List<User>) request.getAttribute("staffList");
+        (List<User>) request.getAttribute("staffList");
 
     if (staffList == null) {
-        staffList = new java.util.ArrayList<>();
+
+        staffList =
+            new java.util.ArrayList<>();
+
     }
 %>
 
 
-<!-- HEADER -->
-
 <header>
 
-    <h1>Sunrise College - Staff Management</h1>
+    <h1>Sunrise College</h1>
 
     <nav>
 
@@ -59,7 +68,7 @@
         </a>
 
         <a href="${pageContext.request.contextPath}/logout">
-            Logout
+            🚪 Logout
         </a>
 
     </nav>
@@ -67,25 +76,46 @@
 </header>
 
 
-<div class="container">
+<main class="container">
+
+
+    <div class="dashboard-heading">
+
+        <div>
+
+            <h2>👨‍🏫 Staff Management</h2>
+
+            <p>
+                Create and manage staff login accounts.
+            </p>
+
+        </div>
+
+        <span class="badge badge-primary">
+            ADMIN ONLY
+        </span>
+
+    </div>
 
 
     <!-- ADD STAFF -->
 
     <div class="card">
 
-        <h2>Add Staff</h2>
+        <h2>➕ Add Staff Account</h2>
 
-        <p>
-            Create a login account for a new staff member.
+        <p style="margin-bottom:20px;">
+            Create a username and password for a staff member.
         </p>
 
 
         <% if (request.getAttribute("error") != null) { %>
 
-            <p class="error">
+            <div class="error">
+
                 <%= request.getAttribute("error") %>
-            </p>
+
+            </div>
 
         <% } %>
 
@@ -94,32 +124,45 @@
               method="post">
 
 
-            <label>
-                Staff Username
-            </label>
+            <div class="form-grid">
 
-            <input
-                type="text"
-                name="username"
-                placeholder="Enter staff username"
-                required
-            >
+                <div>
 
+                    <label>
+                        Staff Username
+                    </label>
 
-            <label>
-                Password
-            </label>
+                    <input
+                        type="text"
+                        name="username"
+                        placeholder="Enter username"
+                        required>
 
-            <input
-                type="password"
-                name="password"
-                placeholder="Enter password"
-                required
-            >
+                </div>
 
 
-            <button type="submit" class="btn">
-                Add Staff
+                <div>
+
+                    <label>
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        name="password"
+                        placeholder="Enter password"
+                        required>
+
+                </div>
+
+            </div>
+
+
+            <button type="submit"
+                    class="btn">
+
+                👨‍🏫 Create Staff Account
+
             </button>
 
         </form>
@@ -131,83 +174,110 @@
 
     <div class="card">
 
-        <h2>All Staff</h2>
+        <h2>📋 Staff Accounts</h2>
+
+        <p>
+            Staff members currently registered in the system.
+        </p>
 
 
-        <table>
+        <div class="table-wrapper">
 
-            <tr>
+            <table>
 
-                <th>ID</th>
+                <thead>
 
-                <th>Username</th>
+                    <tr>
 
-                <th>Role</th>
+                        <th>ID</th>
 
-                <th>Action</th>
+                        <th>Username</th>
 
-            </tr>
+                        <th>Role</th>
 
+                        <th>Action</th>
 
-            <%
-                if (staffList.isEmpty()) {
-            %>
+                    </tr>
 
-                <tr>
-
-                    <td colspan="4">
-                        No staff accounts found.
-                    </td>
-
-                </tr>
-
-            <%
-                } else {
-
-                    for (User staff : staffList) {
-            %>
+                </thead>
 
 
-                <tr>
+                <tbody>
 
-                    <td>
-                        <%= staff.getUserId() %>
-                    </td>
+                <%
+                    if (staffList.isEmpty()) {
+                %>
 
-                    <td>
-                        <%= staff.getUsername() %>
-                    </td>
+                    <tr>
 
-                    <td>
-                        <%= staff.getRole() %>
-                    </td>
+                        <td colspan="4"
+                            style="text-align:center;">
 
-                    <td>
+                            No staff accounts found.
 
-                        <a
-                            class="btn btn-danger"
-                            href="${pageContext.request.contextPath}/staff-management?action=delete&userId=<%= staff.getUserId() %>"
-                            onclick="return confirm('Are you sure you want to delete this staff account?');"
-                        >
-                            Delete
-                        </a>
+                        </td>
 
-                    </td>
+                    </tr>
 
-                </tr>
+                <%
+                    } else {
 
+                        for (User staff : staffList) {
+                %>
 
-            <%
+                    <tr>
+
+                        <td>
+                            <%= staff.getUserId() %>
+                        </td>
+
+                        <td>
+
+                            <strong>
+                                <%= staff.getUsername() %>
+                            </strong>
+
+                        </td>
+
+                        <td>
+
+                            <span class="badge badge-success">
+                                <%= staff.getRole() %>
+                            </span>
+
+                        </td>
+
+                        <td>
+
+                            <a
+                                class="btn btn-danger delete-btn"
+                                data-confirm="Are you sure you want to delete this staff account?"
+                                href="${pageContext.request.contextPath}/staff-management?action=delete&userId=<%= staff.getUserId() %>">
+
+                                Delete
+
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                <%
+                        }
                     }
-                }
-            %>
+                %>
 
-        </table>
+                </tbody>
+
+            </table>
+
+        </div>
 
     </div>
 
 
-</div>
+</main>
+
 
 </body>
 

@@ -10,10 +10,18 @@
 
 <head>
 
-    <title>Sunrise College</title>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Sunrise College | Home</title>
 
     <link rel="stylesheet"
           href="${pageContext.request.contextPath}/css/style.css">
+
+    <script src="${pageContext.request.contextPath}/js/script.js"
+            defer></script>
 
 </head>
 
@@ -25,16 +33,18 @@
 
     <nav>
 
+        <a href="#home">Home</a>
+
         <a href="#about">About</a>
 
-        <a href="#staff">Staff</a>
+        <a href="#academics">Academics</a>
 
         <a href="#achievements">Achievements</a>
 
         <a href="#contact">Contact</a>
 
         <a href="${pageContext.request.contextPath}/login.jsp">
-            Staff / Admin Login
+            🔐 Login
         </a>
 
     </nav>
@@ -42,328 +52,542 @@
 </header>
 
 
-<div class="container">
+<main class="container" id="home">
+
+    <!-- HERO -->
+
+    <section class="hero">
+
+        <div class="hero-content">
+
+            <span class="hero-badge">
+                🎓 Welcome to Sunrise College
+            </span>
+
+            <h2>
+                Building Knowledge.<br>
+                Creating Futures.
+            </h2>
+
+            <p>
+                A modern academic environment focused on
+                quality education, student development and
+                a brighter future.
+            </p>
+
+            <div class="hero-buttons">
+
+                <a href="#student-search" class="btn">
+                    🔍 Check Student Information
+                </a>
+
+                <a href="#about" class="btn btn-secondary">
+                    Learn More
+                </a>
+
+            </div>
+
+        </div>
+
+    </section>
 
 
-    <!-- ============================= -->
-    <!-- SEARCH CHILD -->
-    <!-- ============================= -->
+    <!-- STUDENT SEARCH -->
 
-    <div class="card">
+    <section class="section" id="student-search">
 
-        <h2>View Student Information</h2>
+        <div class="section-title">
 
-        <p>
-            Parents can view their child's academic information
-            using the Registration Number.
-        </p>
+            <h2>🎓 Student Academic Portal</h2>
 
-
-        <form action="${pageContext.request.contextPath}/searchStudent"
-              method="get">
-
-            <label>
-                Student Registration Number
-            </label>
-
-            <input
-                type="text"
-                name="regNo"
-                placeholder="Enter Registration Number"
-                required
-            >
-
-            <button type="submit" class="btn">
-                Search Student
-            </button>
-
-        </form>
-
-    </div>
-
-
-    <!-- ============================= -->
-    <!-- STUDENT RESULT -->
-    <!-- ============================= -->
-
-    <%
-        Student student =
-                (Student) request.getAttribute("student");
-
-        List<WeeklyTest> tests =
-                (List<WeeklyTest>) request.getAttribute("tests");
-
-        String searchedRegNo =
-                request.getParameter("regNo");
-    %>
-
-
-    <%
-        if (searchedRegNo != null &&
-            !searchedRegNo.trim().isEmpty()) {
-    %>
-
-        <div class="card">
-
-            <h2>Student Information</h2>
-
-
-            <%
-                if (student == null) {
-            %>
-
-                <p class="error">
-                    No student found with Registration Number:
-                    <strong><%= searchedRegNo %></strong>
-                </p>
-
-            <%
-                } else {
-            %>
-
-
-                <table>
-
-                    <tr>
-                        <th>Registration No.</th>
-                        <td>
-                            <%= student.getRegNo() %>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <th>Name</th>
-                        <td>
-                            <%= student.getName() %>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <th>Class</th>
-                        <td>
-                            <%= student.getClassNo() %>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <th>Course</th>
-                        <td>
-                            <%= student.getCourseName() %>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <th>Gender</th>
-                        <td>
-                            <%= student.getGender() %>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <th>Village</th>
-                        <td>
-                            <%= student.getVillege() %>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <th>State</th>
-                        <td>
-                            <%= student.getState() %>
-                        </td>
-                    </tr>
-
-                </table>
-
-
-            <%
-                }
-            %>
+            <p>
+                Parents can check their child's academic
+                information using the Registration Number.
+            </p>
 
         </div>
 
 
-        <!-- ============================= -->
-        <!-- WEEKLY TEST RESULTS -->
-        <!-- ============================= -->
+        <div class="card search-card">
+
+           <form class="search-form"
+                 action="${pageContext.request.contextPath}/searchStudent"
+                 method="get">
+
+               <input
+                   type="text"
+                   name="regNo"
+                   placeholder="Enter Student Registration Number"
+                   required>
+
+               <button type="submit" class="btn">
+                   🔍 Search
+               </button>
+
+           </form>
+
+        </div>
+
+    </section>
+
+
+<%
+    Student student =
+            (Student) request.getAttribute("student");
+
+    List<WeeklyTest> tests =
+            (List<WeeklyTest>) request.getAttribute("tests");
+
+    String searchedRegNo =
+            request.getParameter("regNo");
+%>
+
+
+<%
+    if (searchedRegNo != null &&
+        !searchedRegNo.trim().isEmpty()) {
+%>
+
+    <!-- SEARCH RESULT -->
+
+    <section class="section">
 
         <%
-            if (student != null) {
+            if (student == null) {
         %>
 
-        <div class="card">
+            <div class="card">
 
-            <h2>Weekly Test Results</h2>
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+                        🔎
+                    </div>
+
+                    <h3>Student Not Found</h3>
+
+                    <p>
+                        No student was found with Registration Number
+                        <strong><%= searchedRegNo %></strong>.
+                    </p>
+
+                </div>
+
+            </div>
+
+        <%
+            } else {
+        %>
+
+            <!-- STUDENT PROFILE -->
+
+            <div class="card">
+
+                <div class="profile-card">
+
+                    <div class="profile-avatar">
+                        👨‍🎓
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            <%= student.getName() %>
+                        </h2>
+
+                        <p>
+                            Registration Number:
+                            <strong>
+                                <%= student.getRegNo() %>
+                            </strong>
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
 
 
-            <%
-                if (tests == null || tests.isEmpty()) {
-            %>
+            <!-- STUDENT DETAILS -->
 
-                <p>
-                    No weekly test records available.
-                </p>
+            <div class="card">
 
-            <%
-                } else {
-            %>
+                <h2>📋 Student Information</h2>
+
+                <div class="student-info">
+
+                    <div class="info-item">
+                        <span>Registration Number</span>
+                        <strong><%= student.getRegNo() %></strong>
+                    </div>
+
+                    <div class="info-item">
+                        <span>Name</span>
+                        <strong><%= student.getName() %></strong>
+                    </div>
+
+                    <div class="info-item">
+                        <span>Class</span>
+                        <strong><%= student.getClassNo() %></strong>
+                    </div>
+
+                    <div class="info-item">
+                        <span>Course</span>
+                        <strong><%= student.getCourseName() %></strong>
+                    </div>
+
+                    <div class="info-item">
+                        <span>Gender</span>
+                        <strong><%= student.getGender() %></strong>
+                    </div>
+
+                    <div class="info-item">
+                        <span>Village</span>
+                        <strong><%= student.getVillege() %></strong>
+                    </div>
+
+                    <div class="info-item">
+                        <span>Pincode</span>
+                        <strong><%= student.getPincode() %></strong>
+                    </div>
+
+                    <div class="info-item">
+                        <span>State</span>
+                        <strong><%= student.getState() %></strong>
+                    </div>
+
+                </div>
+
+            </div>
 
 
-                <table>
+            <!-- WEEKLY TEST -->
 
-                    <tr>
+            <div class="card">
 
-                        <th>Test ID</th>
+                <h2>📊 Weekly Test Performance</h2>
 
-                        <th>Marks</th>
+                <%
+                    if (tests == null || tests.isEmpty()) {
+                %>
 
-                    </tr>
+                    <div class="empty-state">
 
+                        <div class="empty-icon">
+                            📝
+                        </div>
 
-                    <%
-                        for (WeeklyTest test : tests) {
-                    %>
+                        <p>
+                            No weekly test records available.
+                        </p>
 
-                    <tr>
+                    </div>
 
-                        <td>
-                            <%= test.getTestId() %>
-                        </td>
+                <%
+                    } else {
+                %>
 
-                        <td>
-                            <%= test.getMarks() %>
-                        </td>
+                    <div class="table-wrapper">
 
-                    </tr>
+                        <table>
 
-                    <%
-                        }
-                    %>
+                            <thead>
 
-                </table>
+                                <tr>
 
+                                    <th>Test ID</th>
 
-            <%
-                }
-            %>
+                                    <th>Marks</th>
 
-        </div>
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                            <%
+                                for (WeeklyTest test : tests) {
+                            %>
+
+                                <tr>
+
+                                    <td>
+                                        <strong>
+                                            <%= test.getTestId() %>
+                                        </strong>
+                                    </td>
+
+                                    <td>
+
+                                        <span class="badge badge-success">
+                                            <%= test.getMarks() %> / 100
+                                        </span>
+
+                                    </td>
+
+                                </tr>
+
+                            <%
+                                }
+                            %>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                <%
+                    }
+                %>
+
+            </div>
 
         <%
             }
         %>
 
+    </section>
 
-    <%
-        }
-    %>
+<%
+    }
+%>
 
 
-    <!-- ============================= -->
     <!-- ABOUT -->
-    <!-- ============================= -->
 
-    <div class="card" id="about">
+    <section class="section" id="about">
 
-        <h2>About Us</h2>
+        <div class="section-title">
 
-        <p>
-            Sunrise College is committed to providing
-            quality education across multiple courses.
-        </p>
+            <h2>About Sunrise College</h2>
 
-        <p>
-            Parents can view their child's academic
-            progress using the student's Registration Number.
-        </p>
+            <p>
+                Empowering students through education,
+                knowledge and opportunities.
+            </p>
 
-    </div>
-
-
-    <!-- ============================= -->
-    <!-- STAFF -->
-    <!-- ============================= -->
-
-    <div class="card" id="staff">
-
-        <h2>Our Staff</h2>
+        </div>
 
         <div class="grid-3">
 
-            <div>
-                <strong>Dr. R. Kumar</strong>
-                <br>
-                Principal
+            <div class="card">
+
+                <div class="card-icon">🎓</div>
+
+                <h3>Quality Education</h3>
+
+                <p>
+                    We focus on building strong academic
+                    foundations and practical knowledge.
+                </p>
+
             </div>
 
-            <div>
-                <strong>Mrs. S. Sharma</strong>
-                <br>
-                Vice Principal
+
+            <div class="card">
+
+                <div class="card-icon">👨‍🏫</div>
+
+                <h3>Experienced Faculty</h3>
+
+                <p>
+                    Dedicated faculty members support students
+                    throughout their academic journey.
+                </p>
+
             </div>
 
-            <div>
-                <strong>Mr. A. Verma</strong>
-                <br>
-                Head of Computer Science
+
+            <div class="card">
+
+                <div class="card-icon">🚀</div>
+
+                <h3>Student Growth</h3>
+
+                <p>
+                    We encourage students to develop skills,
+                    confidence and leadership qualities.
+                </p>
+
             </div>
 
         </div>
 
-    </div>
+    </section>
 
 
-    <!-- ============================= -->
+    <!-- ACADEMICS -->
+
+    <section class="section" id="academics">
+
+        <div class="section-title">
+
+            <h2>📚 Academics</h2>
+
+            <p>
+                A balanced approach to academic excellence.
+            </p>
+
+        </div>
+
+        <div class="grid-3">
+
+            <div class="card">
+
+                <div class="card-icon">📖</div>
+
+                <h3>Learning</h3>
+
+                <p>
+                    Structured academic programs designed
+                    for student success.
+                </p>
+
+            </div>
+
+            <div class="card">
+
+                <div class="card-icon">📝</div>
+
+                <h3>Assessments</h3>
+
+                <p>
+                    Regular tests help students and teachers
+                    track academic progress.
+                </p>
+
+            </div>
+
+            <div class="card">
+
+                <div class="card-icon">📊</div>
+
+                <h3>Performance</h3>
+
+                <p>
+                    Student performance can be viewed through
+                    the academic portal.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
     <!-- ACHIEVEMENTS -->
-    <!-- ============================= -->
 
-    <div class="card" id="achievements">
+    <section class="section" id="achievements">
 
-        <h2>Achievements</h2>
+        <div class="section-title">
 
-        <ul>
+            <h2>🏆 Achievements</h2>
 
-            <li>
-                Ranked among top 50 colleges in the state
-            </li>
+            <p>
+                Celebrating student success and excellence.
+            </p>
 
-            <li>
-                Strong placement record
-            </li>
+        </div>
 
-            <li>
-                State-level Inter-College Science Fair winner
-            </li>
+        <div class="grid-3">
 
-        </ul>
+            <div class="card">
 
-    </div>
+                <div class="card-icon">🏆</div>
+
+                <h3>Academic Excellence</h3>
+
+                <p>
+                    Encouraging students to achieve their
+                    highest academic potential.
+                </p>
+
+            </div>
+
+            <div class="card">
+
+                <div class="card-icon">💡</div>
+
+                <h3>Innovation</h3>
+
+                <p>
+                    Promoting creativity, technology and
+                    problem-solving skills.
+                </p>
+
+            </div>
+
+            <div class="card">
+
+                <div class="card-icon">🌟</div>
+
+                <h3>Student Success</h3>
+
+                <p>
+                    Supporting students in reaching their
+                    educational goals.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
 
 
-    <!-- ============================= -->
     <!-- CONTACT -->
-    <!-- ============================= -->
 
-    <div class="card" id="contact">
+    <section class="section" id="contact">
 
-        <h2>Contact</h2>
+        <div class="card">
 
-        <p>
-            Address: 123 College Road, Bengaluru, Karnataka
-        </p>
+            <div class="section-title">
 
-        <p>
-            Phone: +91-80-1234-5678
-        </p>
+                <h2>📞 Contact Us</h2>
 
-        <p>
-            Email: info@sunrisecollege.edu
-        </p>
+                <p>
+                    Get in touch with Sunrise College.
+                </p>
 
-    </div>
+            </div>
+
+            <div class="grid-3">
+
+                <div>
+                    <h3>📍 Address</h3>
+                    <p>Sunrise College</p>
+                </div>
+
+                <div>
+                    <h3>📧 Email</h3>
+                    <p>info@sunrisecollege.com</p>
+                </div>
+
+                <div>
+                    <h3>📱 Phone</h3>
+                    <p>+91 XXXXX XXXXX</p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
 
 
-</div>
+<footer>
+
+    <p>
+        © 2026 Sunrise College. All Rights Reserved.
+    </p>
+
+</footer>
+
 
 </body>
 

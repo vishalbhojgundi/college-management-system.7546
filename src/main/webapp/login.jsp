@@ -1,40 +1,131 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
 <!DOCTYPE html>
+
 <html>
+
 <head>
-    <title>Login - College Management System</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Login | Sunrise College</title>
+
+    <link rel="stylesheet"
+          href="${pageContext.request.contextPath}/css/style.css">
+
 </head>
+
 <body>
+
+
 <header>
+
     <h1>Sunrise College</h1>
+
     <nav>
-        <a href="${pageContext.request.contextPath}/index.jsp">Home</a>
+
+        <a href="${pageContext.request.contextPath}/index.jsp">
+            ← Home
+        </a>
+
     </nav>
+
 </header>
 
-<div class="container login-box">
-    <div class="card">
-        <h2>Login</h2>
 
-        <% if (request.getAttribute("error") != null) { %>
-            <p class="error"><%= request.getAttribute("error") %></p>
-        <% } %>
+<main class="login-page">
 
-        <form action="${pageContext.request.contextPath}/login" method="post">
-            <label>Username</label>
-            <input type="text" name="username" required>
+    <div class="login-box">
 
-            <label>Password</label>
-            <input type="password" name="password" required>
+        <div class="login-card">
 
-            <button type="submit" class="btn">Login</button>
-        </form>
+            <div class="login-logo">
+                🎓
+            </div>
 
-        <p style="margin-top:14px;font-size:13px;color:#666;">
-            Admin / Staff / Parent accounts are provisioned by the college.
-        </p>
+            <div class="login-title">
+
+                <h2>Welcome Back</h2>
+
+                <p>
+                    College Management Portal
+                </p>
+
+            </div>
+
+
+            <% if (request.getAttribute("error") != null) { %>
+
+                <div class="error">
+
+                    <%= request.getAttribute("error") %>
+
+                </div>
+
+            <% } %>
+
+
+            <form action="${pageContext.request.contextPath}/login"
+                  method="post">
+
+                <label>
+                    Username
+                </label>
+
+                <input
+                    type="text"
+                    name="username"
+                    placeholder="Enter username"
+                    autocomplete="username"
+                    required>
+
+
+                <label>
+                    Password
+                </label>
+
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Enter password"
+                    autocomplete="current-password"
+                    required>
+
+
+                <button
+                    type="submit"
+                    class="btn"
+                    style="width:100%; margin-top:5px;">
+
+                    🔐 Login
+
+                </button>
+
+            </form>
+
+
+            <p style="
+                text-align:center;
+                margin-top:20px;
+                font-size:12px;
+                color:#64748b;
+            ">
+
+                Admin / Staff accounts are provisioned
+                by the college.
+
+            </p>
+
+        </div>
+
     </div>
-</div>
+
+</main>
+
+
 </body>
+
 </html>

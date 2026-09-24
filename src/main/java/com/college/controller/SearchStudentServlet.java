@@ -14,37 +14,24 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-/**
- * Public student search.
- *
- * No login or authentication is required.
- *
- * Parents can use the Home page to search
- * their child's academic information using
- * the student's Registration Number.
- */
 @WebServlet("/searchStudent")
 public class SearchStudentServlet extends HttpServlet {
 
-    private static final long serialVersionUID = 1L;
-
     private final StudentDAO studentDAO = new StudentDAO();
-    private final WeeklyTestDAO testDAO = new WeeklyTestDAO();
+    private final WeeklyTestDAO weeklyTestDAO = new WeeklyTestDAO();
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+    protected void doGet(HttpServletRequest request,
+                         HttpServletResponse response)
             throws ServletException, IOException {
 
-        String regNo = req.getParameter("regNo");
+        String regNo = request.getParameter("regNo");
 
-        /*
-         * If registration number is empty,
-         * simply return to Home page.
-         */
+        // If registration number is empty
         if (regNo == null || regNo.trim().isEmpty()) {
 
-            resp.sendRedirect(
-                    req.getContextPath() + "/index.jsp"
+            response.sendRedirect(
+                    request.getContextPath() + "/index.jsp"
             );
 
             return;
@@ -52,39 +39,24 @@ public class SearchStudentServlet extends HttpServlet {
 
         regNo = regNo.trim();
 
-        /*
-         * Find student by Registration Number.
-         */
+        // Find student
         Student student =
                 studentDAO.getStudentByRegNo(regNo);
 
-        /*
-         * Send student information to Home page.
-         */
-        req.setAttribute(
-                "student",
-                student
-        );
+        request.setAttribute("student", student);
 
-        /*
-         * If student exists, load weekly test results.
-         */
+        // If student exists, get weekly tests
         if (student != null) {
 
             List<WeeklyTest> tests =
-                    testDAO.getTestsByRegNo(regNo);
+                    weeklyTestDAO.getTestsByRegNo(regNo);
 
-            req.setAttribute(
-                    "tests",
-                    tests
-            );
+            request.setAttribute("tests", tests);
         }
 
-        /*
-         * Show the result directly on Home page.
-         */
-        req.getRequestDispatcher(
-                "/index.jsp"
-        ).forward(req, resp);
+        // Send result to a NEW JSP PAGE
+        request.getRequestDispatcher(
+                "/student-result.jsp"
+        ).forward(request, response);
     }
 }
