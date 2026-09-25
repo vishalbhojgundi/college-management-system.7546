@@ -13,15 +13,6 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
-/**
- * Handles:
- * 1. View weekly tests
- * 2. Add weekly test
- * 3. Update weekly test
- * 4. Delete weekly test
- *
- * Only ADMIN and STAFF can access this servlet.
- */
 @WebServlet("/weeklytest")
 public class WeeklyTestServlet extends HttpServlet {
 
@@ -30,9 +21,7 @@ public class WeeklyTestServlet extends HttpServlet {
     private final WeeklyTestDAO testDAO = new WeeklyTestDAO();
     private final StudentDAO studentDAO = new StudentDAO();
 
-    /**
-     * Check whether the logged-in user is ADMIN or STAFF.
-     */
+    // Check whether user is ADMIN or STAFF
     private boolean isAuthorized(HttpServletRequest req) {
 
         HttpSession session = req.getSession(false);
@@ -43,51 +32,49 @@ public class WeeklyTestServlet extends HttpServlet {
 
         String role = (String) session.getAttribute("role");
 
-        return "ADMIN".equals(role) || "STAFF".equals(role);
+        return "ADMIN".equals(role) ||
+                "STAFF".equals(role);
     }
 
-    /**
-     * GET:
-     *
-     * /weeklytest
-     *                  -> Show all tests and students
-     *
-     * /weeklytest?action=delete&testId=...
-     *                  -> Delete test
-     */
+    // GET
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+    protected void doGet(
+            HttpServletRequest req,
+            HttpServletResponse resp)
             throws ServletException, IOException {
 
-        // Check login and role
+        // Check login
         if (!isAuthorized(req)) {
-            resp.sendRedirect(req.getContextPath() + "/login.jsp");
+
+            resp.sendRedirect(
+                    req.getContextPath() + "/login.jsp"
+            );
+
             return;
         }
 
         String action = req.getParameter("action");
 
-        /*
-         * DELETE TEST
-         */
+        // DELETE
         if ("delete".equals(action)) {
 
-            String testId = req.getParameter("testId");
+            String idValue = req.getParameter("id");
 
-            if (testId != null && !testId.trim().isEmpty()) {
-                testDAO.deleteTest(testId);
+            if (idValue != null &&
+                    !idValue.trim().isEmpty()) {
+
+                try {
+
+                    int id = Integer.parseInt(idValue);
+
+                    testDAO.deleteTest(id);
+
+                } catch (NumberFormatException e) {
+
+                    e.printStackTrace();
+                }
             }
 
-            /*
-             * IMPORTANT:
-             *
-             * Do NOT redirect directly to:
-             *
-             * /admin/tests.jsp
-             *
-             * Redirect to /weeklytest so that the servlet
-             * loads tests and students again.
-             */
             resp.sendRedirect(
                     req.getContextPath() + "/weeklytest"
             );
@@ -95,59 +82,43 @@ public class WeeklyTestServlet extends HttpServlet {
             return;
         }
 
-        /*
-         * LOAD ALL WEEKLY TEST RECORDS
-         */
+        // Load all tests
         req.setAttribute(
                 "tests",
                 testDAO.getAllTests()
         );
 
-        /*
-         * LOAD ALL STUDENTS
-         *
-         * This is required by tests.jsp because
-         * the Student dropdown uses:
-         *
-         * for (Student s : students)
-         */
+        // Load all students
         req.setAttribute(
                 "students",
                 studentDAO.getAllStudents()
         );
 
-        /*
-         * Forward to JSP.
-         */
+        // Open weekly test page
         req.getRequestDispatcher(
                 "/admin/tests.jsp"
         ).forward(req, resp);
     }
 
-    /**
-     * POST:
-     *
-     * action=add
-     *      -> Add weekly test
-     *
-     * action=update
-     *      -> Update weekly test
-     */
+    // POST
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+    protected void doPost(
+            HttpServletRequest req,
+            HttpServletResponse resp)
             throws ServletException, IOException {
 
-        // Check login and role
+        // Check login
         if (!isAuthorized(req)) {
-            resp.sendRedirect(req.getContextPath() + "/login.jsp");
+
+            resp.sendRedirect(
+                    req.getContextPath() + "/login.jsp"
+            );
+
             return;
         }
 
         String action = req.getParameter("action");
 
-        /*
-         * Create WeeklyTest object.
-         */
         WeeklyTest test = new WeeklyTest();
 
         test.setTestId(
@@ -159,28 +130,42 @@ public class WeeklyTestServlet extends HttpServlet {
         );
 
         test.setMarks(
-                parseIntSafe(req.getParameter("marks"))
+                parseIntSafe(
+                        req.getParameter("marks")
+                )
         );
 
-        /*
-         * ADD TEST
-         */
+        // ADD
         if ("add".equals(action)) {
 
             testDAO.addTest(test);
         }
 
-        /*
-         * UPDATE TEST
-         */
+        // UPDATE
         else if ("update".equals(action)) {
 
-            testDAO.updateTest(test);
+            String idValue =
+                    req.getParameter("id");
+
+            if (idValue != null &&
+                    !idValue.trim().isEmpty()) {
+
+                try {
+
+                    test.setId(
+                            Integer.parseInt(idValue)
+                    );
+
+                    testDAO.updateTest(test);
+
+                } catch (NumberFormatException e) {
+
+                    e.printStackTrace();
+                }
+            }
         }
 
-        /*
-         * Invalid action
-         */
+        // Invalid action
         else {
 
             resp.sendError(
@@ -191,31 +176,20 @@ public class WeeklyTestServlet extends HttpServlet {
             return;
         }
 
-        /*
-         * IMPORTANT:
-         *
-         * Redirect to /weeklytest.
-         *
-         * The servlet will reload:
-         *
-         * 1. tests
-         * 2. students
-         *
-         * and then forward to tests.jsp.
-         */
+        // Reload page
         resp.sendRedirect(
                 req.getContextPath() + "/weeklytest"
         );
     }
 
-    /**
-     * Safely convert String to int.
-     */
+    // Convert String to int safely
     private int parseIntSafe(String value) {
 
         try {
 
-            if (value == null || value.trim().isEmpty()) {
+            if (value == null ||
+                    value.trim().isEmpty()) {
+
                 return 0;
             }
 

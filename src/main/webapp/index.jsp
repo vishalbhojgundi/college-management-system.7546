@@ -15,7 +15,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>Sunrise College | Home</title>
+    <title>BTVP High School | Home</title>
 
     <link rel="stylesheet"
           href="${pageContext.request.contextPath}/css/style.css">
@@ -29,7 +29,7 @@
 
 <header>
 
-    <h1>Sunrise College</h1>
+    <h1>BTVP High School</h1>
 
     <nav>
 
@@ -61,7 +61,7 @@
         <div class="hero-content">
 
             <span class="hero-badge">
-                🎓 Welcome to Sunrise College
+                🎓 Welcome to  BTVP High School
             </span>
 
             <h2>
@@ -361,7 +361,7 @@
 
         <div class="section-title">
 
-            <h2>About Sunrise College</h2>
+            <h2>About BTVP High School</h2>
 
             <p>
                 Empowering students through education,
@@ -549,7 +549,7 @@
                 <h2>📞 Contact Us</h2>
 
                 <p>
-                    Get in touch with Sunrise College.
+                    Get in touch with BTVP Scool.
                 </p>
 
             </div>
@@ -558,17 +558,17 @@
 
                 <div>
                     <h3>📍 Address</h3>
-                    <p>Sunrise College</p>
+                    <p>Near Old Bus Stand,Hallikhed Road,Dubalgundi-585418</p>
                 </div>
 
                 <div>
                     <h3>📧 Email</h3>
-                    <p>info@sunrisecollege.com</p>
+                    <p>btvpschool@dbl.com</p>
                 </div>
 
                 <div>
                     <h3>📱 Phone</h3>
-                    <p>+91 XXXXX XXXXX</p>
+                    <p>+91 7483174469</p>
                 </div>
 
             </div>
@@ -583,7 +583,7 @@
 <footer>
 
     <p>
-        © 2026 Sunrise College. All Rights Reserved.
+        © 2026 BTVP High School. All Rights Reserved.
     </p>
 
 </footer>

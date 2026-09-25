@@ -4,6 +4,8 @@
 <%@ page import="com.college.model.Student" %>
 <%@ page import="com.college.model.User" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.Set" %>
+<%@ page import="java.util.TreeSet" %>
 
 <!DOCTYPE html>
 
@@ -11,54 +13,70 @@
 
 <head>
 
-    <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>Weekly Tests | Sunrise College</title>
+    <title>Weekly Tests | BTVP High School</title>
 
     <link rel="stylesheet"
           href="${pageContext.request.contextPath}/css/style.css">
 
-    <script src="${pageContext.request.contextPath}/js/script.js"
-            defer></script>
-
 </head>
-
 
 <body>
 
-
 <%
     User user =
-        (session != null)
-        ? (User) session.getAttribute("user")
-        : null;
+            (session != null)
+            ? (User) session.getAttribute("user")
+            : null;
 
     if (user == null ||
         !("ADMIN".equals(user.getRole()) ||
           "STAFF".equals(user.getRole()))) {
 
         response.sendRedirect(
-            request.getContextPath() + "/login.jsp"
+                request.getContextPath() + "/login.jsp"
         );
 
         return;
     }
 
-
     List<WeeklyTest> tests =
-        (List<WeeklyTest>) request.getAttribute("tests");
+            (List<WeeklyTest>) request.getAttribute("tests");
 
     List<Student> students =
-        (List<Student>) request.getAttribute("students");
+            (List<Student>) request.getAttribute("students");
+
+
+    /*
+     * Create a list of available classes
+     * from the student table.
+     *
+     * Example:
+     * 7
+     * 8
+     * 9
+     * 10
+     */
+
+    Set<Integer> classNumbers =
+            new TreeSet<>();
+
+    if (students != null) {
+
+        for (Student s : students) {
+
+            classNumbers.add(
+                    s.getClassNo()
+            );
+        }
+    }
 %>
 
 
+<!-- HEADER -->
+
 <header>
 
-    <h1>Sunrise College</h1>
+    <h1>🎓 BTVP High School</h1>
 
     <nav>
 
@@ -67,7 +85,7 @@
         </a>
 
         <a href="${pageContext.request.contextPath}/logout">
-            🚪 Logout
+            Logout
         </a>
 
     </nav>
@@ -75,20 +93,20 @@
 </header>
 
 
-<main class="container">
+<!-- MAIN CONTENT -->
+
+<div class="container">
 
 
-    <div class="dashboard-heading">
+    <!-- PAGE TITLE -->
 
-        <div>
+    <div class="page-header">
 
-            <h2>📝 Weekly Test Management</h2>
+        <h2>📝 Weekly Test Management</h2>
 
-            <p>
-                Record and manage student test marks.
-            </p>
-
-        </div>
+        <p>
+            Record and manage student test marks.
+        </p>
 
     </div>
 
@@ -99,94 +117,110 @@
 
         <h2>➕ Add Weekly Test Mark</h2>
 
-        <form action="${pageContext.request.contextPath}/weeklytest"
-              method="post">
 
-            <input type="hidden"
-                   name="action"
-                   value="add">
+        <form
+                action="${pageContext.request.contextPath}/weeklytest"
+                method="post"
+                id="testForm"
+        >
 
-
-            <div class="form-grid">
-
-
-                <div>
-
-                    <label>
-                        Test ID
-                    </label>
-
-                    <input
-                        type="text"
-                        name="testId"
-                        placeholder="Example: TEST001"
-                        required>
-
-                </div>
+            <input
+                    type="hidden"
+                    name="action"
+                    value="add"
+            >
 
 
-                <div>
+            <!-- TEST ID -->
 
-                    <label>
-                        Student
-                    </label>
+            <label for="testId">
+                Test ID
+            </label>
 
-                    <select name="regNo"
-                            required>
-
-                        <option value="">
-                            Select Student
-                        </option>
-
-                        <%
-                            if (students != null) {
-
-                                for (Student s : students) {
-                        %>
-
-                            <option value="<%= s.getRegNo() %>">
-
-                                <%= s.getRegNo() %>
-                                -
-                                <%= s.getName() %>
-
-                            </option>
-
-                        <%
-                                }
-                            }
-                        %>
-
-                    </select>
-
-                </div>
+            <input
+                    type="text"
+                    id="testId"
+                    name="testId"
+                    placeholder="Example: TEST001"
+                    required
+            >
 
 
-                <div>
+            <!-- CLASS -->
 
-                    <label>
-                        Marks
-                    </label>
+            <label for="classNo">
+                Class
+            </label>
 
-                    <input
-                        type="number"
-                        name="marks"
-                        min="0"
-                        max="100"
-                        placeholder="0 - 100"
-                        required>
+            <select
+                    id="classNo"
+                    name="classNo"
+                    required
+            >
 
-                </div>
+                <option value="">
+                    Select Class
+                </option>
+
+                <%
+                    for (Integer classNo : classNumbers) {
+                %>
+
+                    <option value="<%= classNo %>">
+                        Class <%= classNo %>
+                    </option>
+
+                <%
+                    }
+                %>
+
+            </select>
 
 
-            </div>
+            <!-- STUDENT -->
+
+            <label for="regNo">
+                Student
+            </label>
+
+            <select
+                    id="regNo"
+                    name="regNo"
+                    required
+                    disabled
+            >
+
+                <option value="">
+                    First Select Class
+                </option>
+
+            </select>
 
 
-            <button type="submit"
-                    class="btn">
+            <!-- MARKS -->
 
+            <label for="marks">
+                Marks
+            </label>
+
+            <input
+                    type="number"
+                    id="marks"
+                    name="marks"
+                    min="0"
+                    max="100"
+                    placeholder="0 - 100"
+                    required
+            >
+
+
+            <!-- BUTTON -->
+
+            <button
+                    type="submit"
+                    class="btn"
+            >
                 ➕ Add Test Mark
-
             </button>
 
         </form>
@@ -194,36 +228,34 @@
     </div>
 
 
-    <!-- TEST LIST -->
+    <!-- ALL TEST RECORDS -->
 
     <div class="card">
 
-        <h2>📊 Weekly Test Records</h2>
-
-        <p>
-            Student test performance records.
-        </p>
+        <h2>📋 All Weekly-Test Records</h2>
 
 
-        <div class="table-wrapper">
+        <div style="overflow-x:auto;">
 
             <table>
 
                 <thead>
 
-                    <tr>
+                <tr>
 
-                        <th>Test ID</th>
+                    <th>Test ID</th>
 
-                        <th>Student</th>
+                    <th>Class</th>
 
-                        <th>Reg No</th>
+                    <th>Student</th>
 
-                        <th>Marks</th>
+                    <th>Reg No</th>
 
-                        <th>Action</th>
+                    <th>Marks</th>
 
-                    </tr>
+                    <th>Action</th>
+
+                </tr>
 
                 </thead>
 
@@ -231,13 +263,65 @@
                 <tbody>
 
                 <%
-                    if (tests == null ||
-                        tests.isEmpty()) {
+                    if (tests != null &&
+                        !tests.isEmpty()) {
+
+                        for (WeeklyTest t : tests) {
                 %>
 
                     <tr>
 
-                        <td colspan="5"
+                        <td>
+                            <%= t.getTestId() %>
+                        </td>
+
+
+                        <td>
+                            Class <%= t.getClassNo() %>
+                        </td>
+
+
+                        <td>
+                            <%= t.getStudentName() %>
+                        </td>
+
+
+                        <td>
+                            <%= t.getRegNo() %>
+                        </td>
+
+
+                        <td>
+                            <strong>
+                                <%= t.getMarks() %>
+                            </strong>
+                            / 100
+                        </td>
+
+
+                        <td>
+
+                            <a
+                                    class="btn btn-danger"
+                                    href="${pageContext.request.contextPath}/weeklytest?action=delete&id=<%= t.getId() %>"
+                                    onclick="return confirm('Delete this test record?');"
+                            >
+                                Delete
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                <%
+                        }
+
+                    } else {
+                %>
+
+                    <tr>
+
+                        <td colspan="6"
                             style="text-align:center;">
 
                             No weekly test records found.
@@ -247,56 +331,6 @@
                     </tr>
 
                 <%
-                    } else {
-
-                        for (WeeklyTest t : tests) {
-                %>
-
-                    <tr>
-
-                        <td>
-
-                            <strong>
-                                <%= t.getTestId() %>
-                            </strong>
-
-                        </td>
-
-                        <td>
-                            <%= t.getStudentName() %>
-                        </td>
-
-                        <td>
-                            <%= t.getRegNo() %>
-                        </td>
-
-                        <td>
-
-                            <span class="badge badge-success">
-
-                                <%= t.getMarks() %> / 100
-
-                            </span>
-
-                        </td>
-
-                        <td>
-
-                            <a
-                                class="btn btn-danger delete-btn"
-                                data-confirm="Delete this test record?"
-                                href="${pageContext.request.contextPath}/weeklytest?action=delete&testId=<%= t.getTestId() %>">
-
-                                Delete
-
-                            </a>
-
-                        </td>
-
-                    </tr>
-
-                <%
-                        }
                     }
                 %>
 
@@ -308,8 +342,134 @@
 
     </div>
 
+</div>
 
-</main>
+
+<!-- CLASS → STUDENT FILTER -->
+
+<script>
+
+    /*
+     * Create student data from the students
+     * already loaded by WeeklyTestServlet.
+     */
+
+    const students = [
+
+        <%
+            if (students != null) {
+
+                for (Student s : students) {
+        %>
+
+        {
+            regNo: "<%= s.getRegNo() %>",
+            name: "<%= s.getName() %>",
+            classNo: <%= s.getClassNo() %>
+        },
+
+        <%
+                }
+            }
+        %>
+
+    ];
+
+
+    const classSelect =
+            document.getElementById("classNo");
+
+    const studentSelect =
+            document.getElementById("regNo");
+
+
+    /*
+     * When user selects a class,
+     * show only students belonging
+     * to that class.
+     */
+
+    classSelect.addEventListener(
+        "change",
+        function () {
+
+            const selectedClass =
+                    this.value;
+
+
+            // Clear old students
+
+            studentSelect.innerHTML =
+                    '<option value="">Select Student</option>';
+
+
+            // No class selected
+
+            if (selectedClass === "") {
+
+                studentSelect.disabled = true;
+
+                return;
+            }
+
+
+            // Find students of selected class
+
+            const filteredStudents =
+                    students.filter(
+                        function(student) {
+
+                            return String(
+                                student.classNo
+                            ) === String(
+                                selectedClass
+                            );
+
+                        }
+                    );
+
+
+            // Add students
+
+            filteredStudents.forEach(
+                function(student) {
+
+                    const option =
+                            document.createElement("option");
+
+                    option.value =
+                            student.regNo;
+
+                    option.textContent =
+                            student.regNo +
+                            " - " +
+                            student.name;
+
+                    studentSelect.appendChild(
+                            option
+                    );
+                }
+            );
+
+
+            // Enable student dropdown
+
+            studentSelect.disabled = false;
+
+
+            // If no students
+
+            if (filteredStudents.length === 0) {
+
+                studentSelect.innerHTML =
+                    '<option value="">No students in this class</option>';
+
+            }
+
+        }
+    );
+
+</script>
 
 
 </body>

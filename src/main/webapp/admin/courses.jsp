@@ -15,7 +15,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>Courses | Sunrise College</title>
+    <title>Courses | BTVP SCHOOL</title>
 
     <link rel="stylesheet"
           href="${pageContext.request.contextPath}/css/style.css">
@@ -53,7 +53,7 @@
 
 <header>
 
-    <h1>Sunrise College</h1>
+    <h1>BTVP HIGH SCHOOL</h1>
 
     <nav>
 
@@ -80,7 +80,7 @@
             <h2>📚 Course Management</h2>
 
             <p>
-                Add and manage college courses.
+                Add and manage school courses.
             </p>
 
         </div>
@@ -155,7 +155,7 @@
         <h2>📋 All Courses</h2>
 
         <p>
-            Available courses in the college.
+            Available courses in the School.
         </p>
 
 

@@ -90,7 +90,7 @@
 
 <header class="no-print">
 
-    <h1>Sunrise College</h1>
+    <h1>BTVP HIGH SCHOOL</h1>
 
     <nav>
 
@@ -175,7 +175,7 @@
     <div class="print-header">
 
         <h1>
-            SUNRISE COLLEGE
+           BTVP HIGH SCHOOL
         </h1>
 
         <p>
@@ -468,7 +468,31 @@
 
                                 <span class="badge badge-success">
 
-                                    <%= test.getMarks() %> / 100
+                                    <td>
+                                        <span class="marks-badge">
+                                            <%= test.getMarks() %> / 100
+                                        </span>
+
+                                        <%
+                                            if (test.getMarks() < 40) {
+                                        %>
+
+                                            <span class="result-fail">
+                                                ❌ FAIL
+                                            </span>
+
+                                        <%
+                                            } else {
+                                        %>
+
+                                            <span class="result-pass">
+                                                ✅ PASS
+                                            </span>
+
+                                        <%
+                                            }
+                                        %>
+                                    </td>
 
                                 </span>
 
@@ -543,7 +567,7 @@
 <footer class="no-print">
 
     <p>
-        © 2026 Sunrise College. All Rights Reserved.
+        © 2026 BTVP SCHOOL. All Rights Reserved.
     </p>
 
 </footer>

@@ -16,7 +16,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>Students | Sunrise College</title>
+    <title>Students | BTVP School</title>
 
     <link rel="stylesheet"
           href="${pageContext.request.contextPath}/css/style.css">

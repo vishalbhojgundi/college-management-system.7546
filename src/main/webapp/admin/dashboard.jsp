@@ -12,7 +12,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>Admin Dashboard | Sunrise College</title>
+    <title>Admin Dashboard | BTVP High School</title>
 
     <link rel="stylesheet"
           href="${pageContext.request.contextPath}/css/style.css">
@@ -43,7 +43,7 @@
 
 <header>
 
-    <h1>Sunrise College</h1>
+    <h1>BTVP High School</h1>
 
     <nav>
 
@@ -231,7 +231,7 @@
             </h3>
 
             <p>
-                Add and manage college courses.
+                Add and manage School courses.
             </p>
 
             <a class="btn"

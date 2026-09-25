@@ -11,7 +11,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>Login | Sunrise College</title>
+    <title>Login | BTVP SCHOOL</title>
 
     <link rel="stylesheet"
           href="${pageContext.request.contextPath}/css/style.css">
@@ -23,7 +23,7 @@
 
 <header>
 
-    <h1>Sunrise College</h1>
+    <h1>BTVP SCHOOL</h1>
 
     <nav>
 
