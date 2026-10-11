@@ -15,7 +15,7 @@
     }
 %>
 <header>
-    <h1>Sunrise College - Parent Portal</h1>
+    <h1>BTVP HIGH SCHOOL - Parent Portal</h1>
     <nav>
         <a href="${pageContext.request.contextPath}/logout">Logout</a>
     </nav>

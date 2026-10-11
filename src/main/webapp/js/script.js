@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-    console.log("Sunrise College Management System loaded.");
+    console.log("BTVP HIGH SCHOOL Management System loaded.");
 
     /* Mobile menu / UI helper */
     const buttons = document.querySelectorAll(".btn");

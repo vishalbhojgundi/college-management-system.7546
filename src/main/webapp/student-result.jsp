@@ -15,7 +15,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>Student Academic Report | Sunrise College</title>
+    <title>Student Academic Report | BTVP HIGH SCHOOL</title>
 
     <link rel="stylesheet"
           href="${pageContext.request.contextPath}/css/style.css">

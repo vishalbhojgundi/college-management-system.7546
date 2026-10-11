@@ -59,7 +59,7 @@
 
 <header>
 
-    <h1>Sunrise College</h1>
+    <h1>BTVP HIGH SCHOOL</h1>
 
     <nav>
 

@@ -11,7 +11,7 @@ import java.sql.SQLException;
 public class DBConnection {
 
     private static final String DB_URL =
-            "URL";
+            "URL"
     private static final String DB_USER = "USER";
     private static final String DB_PASSWORD = "PASSWORD";
 
