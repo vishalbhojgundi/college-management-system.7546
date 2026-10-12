@@ -335,6 +335,49 @@
 
             <div>
 
+<!-- Filter students by class -->
+<div class="card class-filter-card">
+    <h2>🔎 Filter Students by Class</h2>
+
+    <form action="${pageContext.request.contextPath}/student"
+          method="get"
+          class="class-filter-form">
+
+        <label for="classNo">Select Class</label>
+
+        <select name="classNo" id="classNo"
+                onchange="this.form.submit()">
+
+            <option value="all"
+                ${empty selectedClass || selectedClass == 'all' ? 'selected' : ''}>
+                All Classes
+            </option>
+
+            <option value="7"
+                ${selectedClass == '7' ? 'selected' : ''}>
+                Class 7
+            </option>
+
+            <option value="8"
+                ${selectedClass == '8' ? 'selected' : ''}>
+                Class 8
+            </option>
+
+            <option value="9"
+                ${selectedClass == '9' ? 'selected' : ''}>
+                Class 9
+            </option>
+
+            <option value="10"
+                ${selectedClass == '10' ? 'selected' : ''}>
+                Class 10
+            </option>
+
+        </select>
+    </form>
+</div>
+
+
                 <h2>
                     📋 All Students
                 </h2>
