@@ -14,6 +14,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,13 +54,14 @@ public class WeeklyTestServlet extends HttpServlet {
 
         String action = req.getParameter("action");
 
+        // Delete one weekly-test record.
         if ("delete".equals(action)) {
             String idValue = req.getParameter("id");
 
             try {
-                if (idValue != null && !idValue.trim().isEmpty()) {
-                    testDAO.deleteTest(Integer.parseInt(idValue));
-                }
+                int id = Integer.parseInt(idValue);
+                testDAO.deleteTest(id);
+
             } catch (NumberFormatException e) {
                 resp.sendError(
                         HttpServletResponse.SC_BAD_REQUEST,
@@ -66,39 +70,66 @@ public class WeeklyTestServlet extends HttpServlet {
                 return;
             }
 
-            resp.sendRedirect(req.getContextPath() + "/weeklytest");
+            String filterClass = req.getParameter("filterClass");
+
+            if (filterClass != null && !filterClass.isEmpty()) {
+                resp.sendRedirect(
+                        req.getContextPath()
+                                + "/weeklytest?filterClass="
+                                + URLEncoder.encode(
+                                filterClass,
+                                StandardCharsets.UTF_8
+                        )
+                );
+            } else {
+                resp.sendRedirect(req.getContextPath() + "/weeklytest");
+            }
+
             return;
         }
 
-        // Load the test records and student list.
-
+        /*
+         * Load every weekly-test record.
+         * Do not filter by test name here.
+         */
         List<WeeklyTest> allTests = testDAO.getAllTests();
 
         String filterClass = req.getParameter("filterClass");
 
-        List<WeeklyTest> filteredTests = new java.util.ArrayList<>();
+        List<WeeklyTest> filteredTests = new ArrayList<>();
 
         for (WeeklyTest test : allTests) {
-            if (filterClass == null
-                    || filterClass.trim().isEmpty()
-                    || "all".equals(filterClass)
-                    || String.valueOf(test.getClassNo()).equals(filterClass)) {
 
+            boolean includeRecord =
+                    filterClass == null
+                            || filterClass.trim().isEmpty()
+                            || "all".equals(filterClass)
+                            || String.valueOf(test.getClassNo())
+                            .equals(filterClass);
+
+            if (includeRecord) {
                 filteredTests.add(test);
             }
         }
 
+        // All records are used when filling previously saved marks.
         req.setAttribute("allTests", allTests);
+
+        // The table displays all tests belonging to the selected class.
         req.setAttribute("tests", filteredTests);
+
         req.setAttribute("filterClass", filterClass);
 
-
+        // Load students for the bulk-entry form.
         List<Student> students = studentDAO.getAllStudents();
         req.setAttribute("students", students);
 
-        // Preserve the selected class and test name after filtering.
+        // Preserve bulk-entry selections.
         req.setAttribute("selectedClass", req.getParameter("classNo"));
         req.setAttribute("testId", req.getParameter("testId"));
+
+        // Display messages after saving marks.
+        req.setAttribute("status", req.getParameter("status"));
 
         req.getRequestDispatcher("/admin/tests.jsp")
                 .forward(req, resp);
@@ -124,7 +155,7 @@ public class WeeklyTestServlet extends HttpServlet {
             return;
         }
 
-        // Preserve existing single-record add and update actions.
+        // Preserve the existing single-record actions.
         WeeklyTest test = new WeeklyTest();
 
         test.setTestId(req.getParameter("testId"));
@@ -143,14 +174,18 @@ public class WeeklyTestServlet extends HttpServlet {
         test.setMarks(marks);
 
         if ("add".equals(action)) {
+
             testDAO.addTest(test);
 
         } else if ("update".equals(action)) {
-            String idValue = req.getParameter("id");
 
             try {
-                test.setId(Integer.parseInt(idValue));
+                test.setId(
+                        Integer.parseInt(req.getParameter("id"))
+                );
+
                 testDAO.updateTest(test);
+
             } catch (NumberFormatException e) {
                 resp.sendError(
                         HttpServletResponse.SC_BAD_REQUEST,
@@ -162,7 +197,7 @@ public class WeeklyTestServlet extends HttpServlet {
         } else {
             resp.sendError(
                     HttpServletResponse.SC_BAD_REQUEST,
-                    "Invalid weekly test action"
+                    "Invalid weekly-test action"
             );
             return;
         }
@@ -183,31 +218,24 @@ public class WeeklyTestServlet extends HttpServlet {
         try {
             classNo = Integer.parseInt(classValue);
         } catch (NumberFormatException e) {
-            resp.sendRedirect(
-                    req.getContextPath()
-                            + "/weeklytest?status=invalidClass"
-            );
+            redirectWithStatus(req, resp, "invalidClass", null, null);
             return;
         }
 
-        if (testId == null || testId.trim().isEmpty()
+        if (testId == null
+                || testId.trim().isEmpty()
                 || testId.trim().length() > 20
-                || classNo < 7 || classNo > 10) {
+                || classNo < 7
+                || classNo > 10) {
 
-            resp.sendRedirect(
-                    req.getContextPath()
-                            + "/weeklytest?status=invalidInput"
-            );
+            redirectWithStatus(req, resp, "invalidInput", null, null);
             return;
         }
 
         String[] regNos = req.getParameterValues("regNos");
 
         if (regNos == null || regNos.length == 0) {
-            resp.sendRedirect(
-                    req.getContextPath()
-                            + "/weeklytest?status=noStudents"
-            );
+            redirectWithStatus(req, resp, "noStudents", null, null);
             return;
         }
 
@@ -215,13 +243,14 @@ public class WeeklyTestServlet extends HttpServlet {
 
         try {
             for (String regNo : regNos) {
+
                 if (regNo == null || regNo.trim().isEmpty()) {
                     continue;
                 }
 
                 String value = req.getParameter("marks_" + regNo);
 
-                // Blank marks are skipped; other entered marks are saved.
+                // Skip blank fields.
                 if (value == null || value.trim().isEmpty()) {
                     continue;
                 }
@@ -229,9 +258,8 @@ public class WeeklyTestServlet extends HttpServlet {
                 int mark = Integer.parseInt(value.trim());
 
                 if (mark < 0 || mark > 100) {
-                    resp.sendRedirect(
-                            req.getContextPath()
-                                    + "/weeklytest?status=invalidMarks"
+                    redirectWithStatus(
+                            req, resp, "invalidMarks", null, null
                     );
                     return;
                 }
@@ -240,18 +268,12 @@ public class WeeklyTestServlet extends HttpServlet {
             }
 
         } catch (NumberFormatException e) {
-            resp.sendRedirect(
-                    req.getContextPath()
-                            + "/weeklytest?status=invalidMarks"
-            );
+            redirectWithStatus(req, resp, "invalidMarks", null, null);
             return;
         }
 
         if (marksByRegNo.isEmpty()) {
-            resp.sendRedirect(
-                    req.getContextPath()
-                            + "/weeklytest?status=noMarks"
-            );
+            redirectWithStatus(req, resp, "noMarks", null, null);
             return;
         }
 
@@ -263,15 +285,45 @@ public class WeeklyTestServlet extends HttpServlet {
 
         String status = saved ? "saved" : "saveFailed";
 
-        resp.sendRedirect(
+        redirectWithStatus(
+                req,
+                resp,
+                status,
+                classNo,
+                testId.trim()
+        );
+    }
+
+    private void redirectWithStatus(
+            HttpServletRequest req,
+            HttpServletResponse resp,
+            String status,
+            Integer classNo,
+            String testId) throws IOException {
+
+        StringBuilder url = new StringBuilder(
                 req.getContextPath()
-                        + "/weeklytest?status=" + status
-                        + "&classNo=" + classNo
-                        + "&testId=" + java.net.URLEncoder.encode(
-                        testId.trim(),
-                        java.nio.charset.StandardCharsets.UTF_8
+                        + "/weeklytest?status="
+                        + URLEncoder.encode(
+                        status,
+                        StandardCharsets.UTF_8
                 )
         );
+
+        if (classNo != null) {
+            url.append("&classNo=").append(classNo);
+        }
+
+        if (testId != null) {
+            url.append("&testId=").append(
+                    URLEncoder.encode(
+                            testId,
+                            StandardCharsets.UTF_8
+                    )
+            );
+        }
+
+        resp.sendRedirect(url.toString());
     }
 
     private int parseIntSafe(String value) {
