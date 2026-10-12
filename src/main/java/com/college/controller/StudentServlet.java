@@ -1,4 +1,7 @@
 package com.college.controller;
+import com.college.model.Student;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.college.dao.CourseDAO;
 import com.college.dao.StudentDAO;
@@ -112,10 +115,39 @@ public class StudentServlet extends HttpServlet {
         /*
          * LOAD STUDENTS
          */
-        req.setAttribute(
-                "students",
-                studentDAO.getAllStudents()
-        );
+
+        List<Student> allStudents = studentDAO.getAllStudents();
+
+        String selectedClass = req.getParameter("classNo");
+
+        List<Student> displayedStudents = new ArrayList<>();
+
+        if (selectedClass == null
+                || selectedClass.trim().isEmpty()
+                || "all".equals(selectedClass)) {
+
+            displayedStudents.addAll(allStudents);
+
+        } else {
+
+            try {
+                int classNumber = Integer.parseInt(selectedClass);
+
+                if (classNumber >= 7 && classNumber <= 10) {
+                    for (Student student : allStudents) {
+                        if (student.getClassNo() == classNumber) {
+                            displayedStudents.add(student);
+                        }
+                    }
+                }
+
+            } catch (NumberFormatException e) {
+                // Invalid class selection: display no students.
+            }
+        }
+
+        req.setAttribute("students", displayedStudents);
+        req.setAttribute("selectedClass", selectedClass);
 
         /*
          * LOAD COURSES
