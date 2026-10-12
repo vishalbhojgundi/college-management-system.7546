@@ -71,7 +71,27 @@ public class WeeklyTestServlet extends HttpServlet {
         }
 
         // Load the test records and student list.
-        req.setAttribute("tests", testDAO.getAllTests());
+
+        List<WeeklyTest> allTests = testDAO.getAllTests();
+
+        String filterClass = req.getParameter("filterClass");
+
+        List<WeeklyTest> filteredTests = new java.util.ArrayList<>();
+
+        for (WeeklyTest test : allTests) {
+            if (filterClass == null
+                    || filterClass.trim().isEmpty()
+                    || "all".equals(filterClass)
+                    || String.valueOf(test.getClassNo()).equals(filterClass)) {
+
+                filteredTests.add(test);
+            }
+        }
+
+        req.setAttribute("allTests", allTests);
+        req.setAttribute("tests", filteredTests);
+        req.setAttribute("filterClass", filterClass);
+
 
         List<Student> students = studentDAO.getAllStudents();
         req.setAttribute("students", students);

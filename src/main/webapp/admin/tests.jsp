@@ -360,6 +360,51 @@
     <div class="card">
         <h2>📚 All Weekly-Test Records</h2>
 
+<form action="${pageContext.request.contextPath}/weeklytest"
+      method="get"
+      style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:20px 0;">
+
+    <label for="filterClass"><strong>Filter marks by class:</strong></label>
+
+    <select name="filterClass"
+            id="filterClass"
+            onchange="this.form.submit()"
+            style="max-width:250px;">
+
+        <option value="all"
+            <%= "all".equals(request.getAttribute("filterClass"))
+                || request.getAttribute("filterClass") == null
+                ? "selected" : "" %>>
+            All Classes
+        </option>
+
+        <option value="7"
+            <%= "7".equals(request.getAttribute("filterClass"))
+                ? "selected" : "" %>>
+            Class 7
+        </option>
+
+        <option value="8"
+            <%= "8".equals(request.getAttribute("filterClass"))
+                ? "selected" : "" %>>
+            Class 8
+        </option>
+
+        <option value="9"
+            <%= "9".equals(request.getAttribute("filterClass"))
+                ? "selected" : "" %>>
+            Class 9
+        </option>
+
+        <option value="10"
+            <%= "10".equals(request.getAttribute("filterClass"))
+                ? "selected" : "" %>>
+            Class 10
+        </option>
+    </select>
+</form>
+
+
         <div style="overflow-x:auto;">
             <table>
                 <thead>
