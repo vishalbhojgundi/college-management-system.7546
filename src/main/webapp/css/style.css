@@ -844,3 +844,49 @@ footer p {
     font-weight: 700;
     font-size: 13px;
 }
+
+/* Student class filter */
+
+.class-filter-card {
+    margin-bottom: 24px;
+}
+
+.class-filter-card h2 {
+    margin-top: 0;
+    margin-bottom: 16px;
+}
+
+.class-filter-form {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.class-filter-form label {
+    font-weight: 600;
+    color: var(--text, #243447);
+}
+
+.class-filter-form select {
+    width: 100%;
+    max-width: 320px;
+    margin: 0;
+    padding: 12px 14px;
+    border: 1px solid var(--border, #dbe4ef);
+    border-radius: 8px;
+    background: #ffffff;
+    color: var(--text, #243447);
+    cursor: pointer;
+}
+
+@media (max-width: 600px) {
+    .class-filter-form {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .class-filter-form select {
+        max-width: 100%;
+    }
+}
