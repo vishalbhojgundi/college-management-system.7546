@@ -1,594 +1,331 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
-<%@ page import="com.college.model.Student" %>
-<%@ page import="com.college.model.WeeklyTest" %>
-<%@ page import="java.util.List" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+         pageEncoding="UTF-8" %>
 
 <!DOCTYPE html>
-
-<html>
-
+<html lang="en">
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <title>BTVP HIGH SCHOOL | Student Management</title>
 
-    <title>BTVP High School | Home</title>
+    <meta name="description"
+          content="BTVP High School student information and academic management portal.">
 
     <link rel="stylesheet"
           href="${pageContext.request.contextPath}/css/style.css">
-
-    <script src="${pageContext.request.contextPath}/js/script.js"
-            defer></script>
-
 </head>
 
 <body>
 
-<header>
+<header class="site-header">
+    <div class="container header-inner">
 
-    <h1>BTVP High School</h1>
+        <a class="brand" href="${pageContext.request.contextPath}/">
+            <span class="brand-logo">B</span>
 
-    <nav>
-
-        <a href="#home">Home</a>
-
-        <a href="#about">About</a>
-
-        <a href="#academics">Academics</a>
-
-        <a href="#achievements">Achievements</a>
-
-        <a href="#contact">Contact</a>
-
-        <a href="${pageContext.request.contextPath}/login.jsp">
-            🔐 Login
+            <span class="brand-text">
+                <span class="brand-name">BTVP HIGH SCHOOL</span>
+                <span class="brand-subtitle">
+                    Education · Excellence · Success
+                </span>
+            </span>
         </a>
 
-    </nav>
+        <nav class="main-nav" aria-label="Main navigation">
+            <a href="#home">Home</a>
+            <a href="#about">About College</a>
+            <a href="#staff">Staff</a>
+            <a href="#achievements">Achievements</a>
+            <a href="#contact">Contact</a>
 
+            <a class="nav-login"
+               href="${pageContext.request.contextPath}/login.jsp">
+                Admin / Staff Login
+            </a>
+        </nav>
+
+    </div>
 </header>
 
+<main>
 
-<main class="container" id="home">
+    <!-- Hero section -->
+    <section class="hero" id="home">
+        <div class="container hero-inner">
 
-    <!-- HERO -->
+            <div class="hero-content">
+                <span class="hero-label">Welcome to our institution</span>
 
-    <section class="hero">
+                <h1>Building Knowledge.<br>Shaping the Future.</h1>
 
-        <div class="hero-content">
+                <p>
+                    Welcome to BTVP HIGH SCHOOL. We are committed to
+                    quality education, student development, and creating
+                    a supportive environment where every student can grow
+                    and succeed.
+                </p>
 
-            <span class="hero-badge">
-                🎓 Welcome to  BTVP High School
-            </span>
+                <div class="hero-actions">
+                    <a class="btn btn-white" href="#student-search">
+                        Search Student Results
+                    </a>
 
-            <h2>
-                Building Knowledge.<br>
-                Creating Futures.
-            </h2>
+                    <a class="btn btn-outline" href="#about">
+                        Discover Our School
+                    </a>
+                </div>
+            </div>
 
-            <p>
-                A modern academic environment focused on
-                quality education, student development and
-                a brighter future.
-            </p>
+            <aside class="hero-panel">
+                <h2>Student Information Portal</h2>
 
-            <div class="hero-buttons">
+                <p>
+                    Access student information using the registration
+                    number provided by the school.
+                </p>
 
-                <a href="#student-search" class="btn">
-                    🔍 Check Student Information
-                </a>
+                <div class="hero-panel-list">
+                    <div class="hero-panel-item">
+                        <span class="hero-panel-icon">&#10003;</span>
+                        Student information lookup
+                    </div>
 
-                <a href="#about" class="btn btn-secondary">
-                    Learn More
-                </a>
+                    <div class="hero-panel-item">
+                        <span class="hero-panel-icon">&#128218;</span>
+                        Academic information
+                    </div>
 
+                    <div class="hero-panel-item">
+                        <span class="hero-panel-icon">&#128274;</span>
+                        Staff and administrator access
+                    </div>
+                </div>
+            </aside>
+
+        </div>
+    </section>
+
+    <!-- Student search -->
+    <section class="search-section" id="student-search">
+        <div class="container">
+
+            <div class="search-card">
+                <h2>Find Student Information</h2>
+
+                <p>
+                    Enter the student's registration number to view
+                    the available student and academic details.
+                </p>
+
+                <form class="search-form"
+                      action="${pageContext.request.contextPath}/searchStudent"
+                      method="get">
+
+                    <input
+                        type="text"
+                        id="regNo"
+                        name="regNo"
+                        placeholder="Example: BTVP2026STD01"
+                        aria-label="Student registration number"
+                        autocomplete="off"
+                        required>
+
+                    <button type="submit" class="btn btn-primary">
+                        Search Student
+                    </button>
+
+                </form>
             </div>
 
         </div>
-
     </section>
 
-
-    <!-- STUDENT SEARCH -->
-
-    <section class="section" id="student-search">
-
-        <div class="section-title">
-
-            <h2>🎓 Student Academic Portal</h2>
-
-            <p>
-                Parents can check their child's academic
-                information using the Registration Number.
-            </p>
-
-        </div>
-
-
-        <div class="card search-card">
-
-           <form class="search-form"
-                 action="${pageContext.request.contextPath}/searchStudent"
-                 method="get">
-
-               <input
-                   type="text"
-                   name="regNo"
-                   placeholder="Enter Student Registration Number"
-                   required>
-
-               <button type="submit" class="btn">
-                   🔍 Search
-               </button>
-
-           </form>
-
-        </div>
-
-    </section>
-
-
-<%
-    Student student =
-            (Student) request.getAttribute("student");
-
-    List<WeeklyTest> tests =
-            (List<WeeklyTest>) request.getAttribute("tests");
-
-    String searchedRegNo =
-            request.getParameter("regNo");
-%>
-
-
-<%
-    if (searchedRegNo != null &&
-        !searchedRegNo.trim().isEmpty()) {
-%>
-
-    <!-- SEARCH RESULT -->
-
-    <section class="section">
-
-        <%
-            if (student == null) {
-        %>
-
-            <div class="card">
-
-                <div class="empty-state">
-
-                    <div class="empty-icon">
-                        🔎
-                    </div>
-
-                    <h3>Student Not Found</h3>
-
-                    <p>
-                        No student was found with Registration Number
-                        <strong><%= searchedRegNo %></strong>.
-                    </p>
-
-                </div>
-
-            </div>
-
-        <%
-            } else {
-        %>
-
-            <!-- STUDENT PROFILE -->
-
-            <div class="card">
-
-                <div class="profile-card">
-
-                    <div class="profile-avatar">
-                        👨‍🎓
-                    </div>
-
-                    <div>
-
-                        <h2>
-                            <%= student.getName() %>
-                        </h2>
-
-                        <p>
-                            Registration Number:
-                            <strong>
-                                <%= student.getRegNo() %>
-                            </strong>
-                        </p>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- STUDENT DETAILS -->
-
-            <div class="card">
-
-                <h2>📋 Student Information</h2>
-
-                <div class="student-info">
-
-                    <div class="info-item">
-                        <span>Registration Number</span>
-                        <strong><%= student.getRegNo() %></strong>
-                    </div>
-
-                    <div class="info-item">
-                        <span>Name</span>
-                        <strong><%= student.getName() %></strong>
-                    </div>
-
-                    <div class="info-item">
-                        <span>Class</span>
-                        <strong><%= student.getClassNo() %></strong>
-                    </div>
-
-                    <div class="info-item">
-                        <span>Course</span>
-                        <strong><%= student.getCourseName() %></strong>
-                    </div>
-
-                    <div class="info-item">
-                        <span>Gender</span>
-                        <strong><%= student.getGender() %></strong>
-                    </div>
-
-                    <div class="info-item">
-                        <span>Village</span>
-                        <strong><%= student.getVillege() %></strong>
-                    </div>
-
-                    <div class="info-item">
-                        <span>Pincode</span>
-                        <strong><%= student.getPincode() %></strong>
-                    </div>
-
-                    <div class="info-item">
-                        <span>State</span>
-                        <strong><%= student.getState() %></strong>
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- WEEKLY TEST -->
-
-            <div class="card">
-
-                <h2>📊 Weekly Test Performance</h2>
-
-                <%
-                    if (tests == null || tests.isEmpty()) {
-                %>
-
-                    <div class="empty-state">
-
-                        <div class="empty-icon">
-                            📝
-                        </div>
-
-                        <p>
-                            No weekly test records available.
-                        </p>
-
-                    </div>
-
-                <%
-                    } else {
-                %>
-
-                    <div class="table-wrapper">
-
-                        <table>
-
-                            <thead>
-
-                                <tr>
-
-                                    <th>Test ID</th>
-
-                                    <th>Marks</th>
-
-                                </tr>
-
-                            </thead>
-
-                            <tbody>
-
-                            <%
-                                for (WeeklyTest test : tests) {
-                            %>
-
-                                <tr>
-
-                                    <td>
-                                        <strong>
-                                            <%= test.getTestId() %>
-                                        </strong>
-                                    </td>
-
-                                    <td>
-
-                                        <span class="badge badge-success">
-                                            <%= test.getMarks() %> / 100
-                                        </span>
-
-                                    </td>
-
-                                </tr>
-
-                            <%
-                                }
-                            %>
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-                <%
-                    }
-                %>
-
-            </div>
-
-        <%
-            }
-        %>
-
-    </section>
-
-<%
-    }
-%>
-
-
-    <!-- ABOUT -->
-
+    <!-- About -->
     <section class="section" id="about">
+        <div class="container">
 
-        <div class="section-title">
+            <h2 class="section-heading">About Our School</h2>
 
-            <h2>About BTVP High School</h2>
-
-            <p>
-                Empowering students through education,
-                knowledge and opportunities.
+            <p class="section-description">
+                Our aim is to support students through quality teaching,
+                academic guidance, discipline, and opportunities to
+                develop their knowledge and abilities.
             </p>
 
+            <div class="card-grid">
+
+                <article class="card">
+                    <div class="card-icon">&#128218;</div>
+                    <h3>Quality Education</h3>
+                    <p>
+                        Encourage learning, understanding, curiosity,
+                        and strong academic foundations.
+                    </p>
+                </article>
+
+                <article class="card">
+                    <div class="card-icon">&#127919;</div>
+                    <h3>Student Development</h3>
+                    <p>
+                        Support students in developing confidence,
+                        responsibility, and practical skills.
+                    </p>
+                </article>
+
+                <article class="card">
+                    <div class="card-icon">&#129309;</div>
+                    <h3>Supportive Environment</h3>
+                    <p>
+                        Promote respect, cooperation, discipline,
+                        and positive relationships.
+                    </p>
+                </article>
+
+            </div>
         </div>
-
-        <div class="grid-3">
-
-            <div class="card">
-
-                <div class="card-icon">🎓</div>
-
-                <h3>Quality Education</h3>
-
-                <p>
-                    We focus on building strong academic
-                    foundations and practical knowledge.
-                </p>
-
-            </div>
-
-
-            <div class="card">
-
-                <div class="card-icon">👨‍🏫</div>
-
-                <h3>Experienced Faculty</h3>
-
-                <p>
-                    Dedicated faculty members support students
-                    throughout their academic journey.
-                </p>
-
-            </div>
-
-
-            <div class="card">
-
-                <div class="card-icon">🚀</div>
-
-                <h3>Student Growth</h3>
-
-                <p>
-                    We encourage students to develop skills,
-                    confidence and leadership qualities.
-                </p>
-
-            </div>
-
-        </div>
-
     </section>
 
+    <!-- Staff -->
+    <section class="section" id="staff"
+             style="background: #edf2f9;">
 
-    <!-- ACADEMICS -->
+        <div class="container">
+            <h2 class="section-heading">Our Staff</h2>
 
-    <section class="section" id="academics">
-
-        <div class="section-title">
-
-            <h2>📚 Academics</h2>
-
-            <p>
-                A balanced approach to academic excellence.
+            <p class="section-description">
+                Teachers and staff contribute to student learning,
+                academic guidance, and the smooth functioning of
+                the school.
             </p>
 
+            <div class="card-grid">
+
+                <article class="card">
+                    <div class="card-icon">&#128104;&#8205;&#127979;</div>
+                    <h3>Dedicated Teachers</h3>
+                    <p>
+                        Helping students understand subjects and
+                        strengthen their academic foundations.
+                    </p>
+                </article>
+
+                <article class="card">
+                    <div class="card-icon">&#128100;</div>
+                    <h3>Academic Guidance</h3>
+                    <p>
+                        Supporting students in their learning
+                        progress and educational development.
+                    </p>
+                </article>
+
+                <article class="card">
+                    <div class="card-icon">&#128188;</div>
+                    <h3>School Administration</h3>
+                    <p>
+                        Managing student records, academic activities,
+                        and essential school information.
+                    </p>
+                </article>
+
+            </div>
         </div>
-
-        <div class="grid-3">
-
-            <div class="card">
-
-                <div class="card-icon">📖</div>
-
-                <h3>Learning</h3>
-
-                <p>
-                    Structured academic programs designed
-                    for student success.
-                </p>
-
-            </div>
-
-            <div class="card">
-
-                <div class="card-icon">📝</div>
-
-                <h3>Assessments</h3>
-
-                <p>
-                    Regular tests help students and teachers
-                    track academic progress.
-                </p>
-
-            </div>
-
-            <div class="card">
-
-                <div class="card-icon">📊</div>
-
-                <h3>Performance</h3>
-
-                <p>
-                    Student performance can be viewed through
-                    the academic portal.
-                </p>
-
-            </div>
-
-        </div>
-
     </section>
 
-
-    <!-- ACHIEVEMENTS -->
-
+    <!-- Achievements -->
     <section class="section" id="achievements">
+        <div class="container">
 
-        <div class="section-title">
+            <h2 class="section-heading">Our Commitment</h2>
 
-            <h2>🏆 Achievements</h2>
-
-            <p>
-                Celebrating student success and excellence.
+            <p class="section-description">
+                We focus on the essential foundations of a successful
+                educational experience.
             </p>
 
+            <div class="card-grid">
+
+                <article class="card">
+                    <div class="card-icon">&#127942;</div>
+                    <h3>Academic Progress</h3>
+                    <p>
+                        Encourage continuous improvement in learning
+                        and academic performance.
+                    </p>
+                </article>
+
+                <article class="card">
+                    <div class="card-icon">&#127793;</div>
+                    <h3>Overall Growth</h3>
+                    <p>
+                        Promote personal development, confidence,
+                        good habits, and responsibility.
+                    </p>
+                </article>
+
+                <article class="card">
+                    <div class="card-icon">&#11088;</div>
+                    <h3>Future Readiness</h3>
+                    <p>
+                        Inspire students to set goals and prepare
+                        for future educational opportunities.
+                    </p>
+                </article>
+
+            </div>
         </div>
-
-        <div class="grid-3">
-
-            <div class="card">
-
-                <div class="card-icon">🏆</div>
-
-                <h3>Academic Excellence</h3>
-
-                <p>
-                    Encouraging students to achieve their
-                    highest academic potential.
-                </p>
-
-            </div>
-
-            <div class="card">
-
-                <div class="card-icon">💡</div>
-
-                <h3>Innovation</h3>
-
-                <p>
-                    Promoting creativity, technology and
-                    problem-solving skills.
-                </p>
-
-            </div>
-
-            <div class="card">
-
-                <div class="card-icon">🌟</div>
-
-                <h3>Student Success</h3>
-
-                <p>
-                    Supporting students in reaching their
-                    educational goals.
-                </p>
-
-            </div>
-
-        </div>
-
     </section>
 
+    <!-- Contact -->
+    <section class="section" id="contact"
+             style="background: #edf2f9;">
 
-    <!-- CONTACT -->
+        <div class="container">
+            <h2 class="section-heading">Contact &amp; Information</h2>
 
-    <section class="section" id="contact">
+            <p class="section-description">
+                For student records, academic information, or
+                administrative assistance, please contact the school
+                office.
+            </p>
 
-        <div class="card">
+            <div class="content-panel">
+                <h3>BTVP HIGH SCHOOL</h3>
 
-            <div class="section-title">
-
-                <h2>📞 Contact Us</h2>
-
-                <p>
-                    Get in touch with BTVP Scool.
+                <p class="muted">
+                    Please contact the school office for verified
+                    address details, office hours, and other official
+                    contact information.
                 </p>
 
+                <a class="btn btn-primary"
+                   href="${pageContext.request.contextPath}/login.jsp">
+                    Staff / Admin Login
+                </a>
             </div>
-
-            <div class="grid-3">
-
-                <div>
-                    <h3>📍 Address</h3>
-                    <p>Near Old Bus Stand,Hallikhed Road,Dubalgundi-585418</p>
-                </div>
-
-                <div>
-                    <h3>📧 Email</h3>
-                    <p>btvpschool@dbl.com</p>
-                </div>
-
-                <div>
-                    <h3>📱 Phone</h3>
-                    <p>+91 7483174469</p>
-                </div>
-
-            </div>
-
         </div>
-
     </section>
 
 </main>
 
+<footer class="site-footer">
+    <div class="container footer-inner">
 
-<footer>
+        <p>
+            &copy; <%= java.time.Year.now().getValue() %>
+            BTVP HIGH SCHOOL. All rights reserved.
+        </p>
 
-    <p>
-        © 2026 BTVP High School. All Rights Reserved.
-    </p>
+        <div class="footer-links">
+            <a href="#home">Home</a>
+            <a href="#about">About</a>
+            <a href="#student-search">Student Search</a>
+            <a href="#contact">Contact</a>
+        </div>
 
+    </div>
 </footer>
 
-
 </body>
-
 </html>
