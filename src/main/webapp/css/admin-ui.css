@@ -1,0 +1,731 @@
+
+/* =====================================================
+   BTVP HIGH SCHOOL - MANAGEMENT SYSTEM
+   Complete shared stylesheet
+   ===================================================== */
+
+/* ---------- Theme ---------- */
+:root {
+    --navy: #15345b;
+    --navy-dark: #0e2440;
+    --blue: #2868d7;
+    --blue-hover: #1e54b5;
+    --page: #f4f7fb;
+    --white: #ffffff;
+    --text: #243247;
+    --muted: #69788d;
+    --border: #e0e7f0;
+    --green: #15803d;
+    --green-bg: #e8f7ee;
+    --red: #c62828;
+    --red-bg: #fff0f0;
+    --shadow: 0 5px 20px rgba(21, 52, 91, 0.06);
+}
+
+/* ---------- Global ---------- */
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    background: var(--page);
+    color: var(--text);
+    font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.55;
+}
+
+a {
+    color: var(--blue);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+img {
+    max-width: 100%;
+}
+
+/* ---------- Navigation header ---------- */
+header {
+    min-height: 70px;
+    padding: 14px 4%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    background: var(--navy);
+    color: var(--white);
+    box-shadow: 0 3px 12px rgba(14, 36, 64, 0.14);
+}
+
+header h1 {
+    margin: 0;
+    color: var(--white);
+    font-size: 20px;
+    font-weight: 750;
+    letter-spacing: 0.2px;
+}
+
+header nav {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+header nav a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 13px;
+    border-radius: 7px;
+    color: #edf4ff;
+    font-weight: 600;
+    transition: background 0.2s ease;
+}
+
+header nav a:hover,
+header nav a:focus-visible {
+    background: rgba(255, 255, 255, 0.12);
+    color: white;
+}
+
+/* ---------- Page containers ---------- */
+.container,
+.dashboard-container {
+    width: min(1220px, calc(100% - 36px));
+    margin: 26px auto 42px;
+}
+
+.dashboard-container {
+    max-width: 1160px;
+}
+
+/* ---------- Page headings ---------- */
+.dashboard-heading,
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 22px;
+}
+
+.dashboard-heading h2,
+.page-header h2 {
+    margin: 0 0 5px;
+    color: var(--navy);
+    font-size: 26px;
+    line-height: 1.3;
+}
+
+.dashboard-heading p,
+.page-header p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+/* ---------- Cards and panels ---------- */
+.card,
+.action-card,
+.content-panel {
+    min-width: 0;
+    padding: 23px;
+    margin-bottom: 22px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--white);
+    box-shadow: var(--shadow);
+}
+
+.card h2,
+.action-card h3,
+.content-panel h2 {
+    margin: 0 0 9px;
+    color: var(--navy);
+}
+
+.card h2 {
+    font-size: 19px;
+}
+
+.action-card h3 {
+    font-size: 17px;
+}
+
+.card p,
+.action-card p {
+    color: var(--muted);
+}
+
+/* ---------- Dashboard grids ---------- */
+.grid-2,
+.grid-3,
+.grid-4 {
+    display: grid;
+    gap: 18px;
+}
+
+.grid-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.grid-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.grid-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.action-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 0;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.action-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 26px rgba(21, 52, 91, 0.10);
+}
+
+.action-card .icon {
+    width: 47px;
+    height: 47px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+    border-radius: 12px;
+    background: #eaf1ff;
+    font-size: 23px;
+}
+
+.action-card p {
+    flex: 1;
+    margin: 0 0 18px;
+    font-size: 13px;
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 38px;
+    padding: 9px 14px;
+    border: 1px solid var(--blue);
+    border-radius: 7px;
+    background: var(--blue);
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.btn:hover {
+    background: var(--blue-hover);
+    border-color: var(--blue-hover);
+    color: white;
+}
+
+.btn-secondary {
+    background: white;
+    color: var(--navy);
+    border-color: var(--border);
+}
+
+.btn-secondary:hover {
+    background: #edf2f9;
+    color: var(--navy);
+    border-color: #cbd6e5;
+}
+
+.btn-danger {
+    background: #c93232;
+    border-color: #c93232;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #a82020;
+    border-color: #a82020;
+}
+
+.btn-success {
+    background: var(--green);
+    border-color: var(--green);
+    color: white;
+}
+
+.btn-success:hover {
+    background: #116b32;
+    border-color: #116b32;
+}
+
+/* ---------- Badges ---------- */
+.badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 30px;
+    background: #eaf1ff;
+    color: #214f9b;
+    font-size: 11px;
+    font-weight: 750;
+    white-space: nowrap;
+}
+
+.badge-primary {
+    background: #eaf1ff;
+    color: #214f9b;
+}
+
+.badge-success {
+    background: var(--green-bg);
+    color: var(--green);
+}
+
+.badge-danger {
+    background: var(--red-bg);
+    color: var(--red);
+}
+
+/* ---------- Form controls ---------- */
+label {
+    display: block;
+    margin-bottom: 6px;
+    color: #34445a;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    min-width: 0;
+    min-height: 40px;
+    padding: 9px 11px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    outline: none;
+    background: white;
+    color: var(--text);
+    font: inherit;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(40, 104, 215, 0.12);
+}
+
+input[readonly] {
+    background: #f1f4f8;
+    color: var(--muted);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 17px 20px;
+    margin: 20px 0;
+}
+
+.form-grid > div {
+    min-width: 0;
+}
+
+/* ---------- Class filters ---------- */
+.class-filter-card {
+    margin: 0 0 22px;
+    padding: 17px 19px;
+    box-shadow: none;
+    background: #f9fbff;
+}
+
+.class-filter-card h2 {
+    margin-bottom: 12px;
+    font-size: 16px;
+}
+
+.class-filter-form {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.class-filter-form label {
+    margin: 0;
+}
+
+.class-filter-form select {
+    width: min(260px, 100%);
+}
+
+/* ---------- Tables ---------- */
+.table-wrapper,
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    background: white;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    font-size: 13px;
+}
+
+thead {
+    background: #edf2f9;
+}
+
+th {
+    padding: 13px 12px;
+    color: var(--navy);
+    text-align: left;
+    white-space: nowrap;
+    font-weight: 750;
+}
+
+td {
+    padding: 11px 12px;
+    border-top: 1px solid #eaf0f6;
+    vertical-align: middle;
+}
+
+tbody tr:hover {
+    background: #f8faff;
+}
+
+td .btn {
+    min-height: 31px;
+    padding: 5px 9px;
+    margin: 2px 2px 2px 0;
+    font-size: 12px;
+}
+
+/* ---------- Weekly test marks table ---------- */
+.bulk-marks-table input[type="number"] {
+    width: 112px;
+    min-width: 85px;
+    margin: 0;
+}
+
+.bulk-marks-table td,
+.bulk-marks-table th {
+    vertical-align: middle;
+}
+
+/* ---------- Weekly test entry layout ---------- */
+.marks-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(200px, 1fr) 150px;
+    gap: 16px;
+    align-items: end;
+}
+
+.marks-toolbar > div {
+    min-width: 0;
+}
+
+.marks-toolbar label {
+    display: block;
+    margin-bottom: 7px;
+}
+
+.marks-toolbar input,
+.marks-toolbar select {
+    width: 100%;
+    min-height: 44px;
+}
+
+.marks-toolbar .btn {
+    width: 100%;
+    min-height: 44px;
+    white-space: nowrap;
+}
+
+/* ---------- Weekly test page layout ---------- */
+body:has(#classSelectionForm) main.container {
+    width: min(1500px, calc(100% - 48px));
+    max-width: 1500px;
+    margin: 24px auto 36px;
+}
+
+body:has(#classSelectionForm) .dashboard-heading {
+    margin-bottom: 20px;
+}
+
+body:has(#classSelectionForm) .dashboard-heading h2 {
+    font-size: 28px;
+}
+
+body:has(#classSelectionForm) main.container > section.card {
+    padding: 22px 24px;
+    margin-bottom: 18px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 14px rgba(21, 52, 91, 0.05);
+}
+
+body:has(#classSelectionForm) main.container > section.card > h2 {
+    margin: 0 0 10px;
+    color: var(--navy);
+    font-size: 21px;
+    line-height: 1.35;
+}
+
+body:has(#classSelectionForm) main.container > section.card > p {
+    margin: 0 0 12px;
+    color: var(--muted);
+}
+
+body:has(#classSelectionForm) #classSelectionForm .marks-toolbar {
+    grid-template-columns: minmax(0, 1.5fr) minmax(200px, 1fr) 150px;
+    gap: 16px;
+    align-items: end;
+}
+
+body:has(#classSelectionForm) #classSelectionForm .marks-toolbar > div {
+    min-width: 0;
+}
+
+body:has(#classSelectionForm) #classSelectionForm .marks-toolbar button {
+    width: 100%;
+    min-height: 44px;
+}
+
+/* Saved-record class filter */
+body:has(#classSelectionForm) .class-filter-form {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+body:has(#classSelectionForm) .class-filter-form label {
+    margin: 0;
+}
+
+body:has(#classSelectionForm) .class-filter-form select {
+    width: min(300px, 100%);
+    min-height: 42px;
+}
+
+/* ---------- Status messages ---------- */
+.status-message,
+.alert {
+    padding: 12px 15px;
+    margin-bottom: 17px;
+    border: 1px solid #c9e0f8;
+    border-radius: 8px;
+    background: #eef7ff;
+    color: #174d7b;
+}
+
+.status-success,
+.alert-success {
+    border-color: #b8e5ca;
+    background: var(--green-bg);
+    color: #166534;
+}
+
+.status-error,
+.alert-danger {
+    border-color: #f2c3c3;
+    background: var(--red-bg);
+    color: #a61f1f;
+}
+
+/* ---------- Pass / fail results ---------- */
+.pass-mark {
+    display: inline-block;
+    padding: 4px 9px;
+    border-radius: 30px;
+    background: var(--green-bg);
+    color: var(--green);
+    font-weight: 800;
+    font-size: 11px;
+}
+
+.fail-mark {
+    display: inline-block;
+    padding: 4px 9px;
+    border-radius: 30px;
+    background: var(--red-bg);
+    color: var(--red);
+    font-weight: 800;
+    font-size: 11px;
+}
+
+.result-cell {
+    white-space: nowrap;
+}
+
+/* ---------- Tablet ---------- */
+@media (max-width: 900px) {
+    .grid-4,
+    .grid-3 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .marks-toolbar {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .marks-toolbar > div:last-child {
+        grid-column: 1 / -1;
+    }
+
+    body:has(#classSelectionForm) main.container {
+        width: calc(100% - 32px);
+    }
+
+    body:has(#classSelectionForm) #classSelectionForm .marks-toolbar {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    body:has(#classSelectionForm) #classSelectionForm .marks-toolbar > div:last-child {
+        grid-column: 1 / -1;
+    }
+
+    body:has(#classSelectionForm) #classSelectionForm .marks-toolbar > div:last-child .btn {
+        width: auto;
+        min-width: 150px;
+    }
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 600px) {
+    header {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 15px 18px;
+    }
+
+    header nav {
+        width: 100%;
+    }
+
+    header nav a {
+        padding: 7px 10px;
+    }
+
+    .container,
+    .dashboard-container {
+        width: calc(100% - 24px);
+        margin-top: 18px;
+    }
+
+    .dashboard-heading h2,
+    .page-header h2 {
+        font-size: 22px;
+    }
+
+    .card,
+    .action-card,
+    .content-panel {
+        padding: 17px;
+    }
+
+    .grid-2,
+    .grid-3,
+    .grid-4,
+    .form-grid,
+    .marks-toolbar {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .marks-toolbar > div:last-child {
+        grid-column: auto;
+    }
+
+    .class-filter-form {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .class-filter-form select {
+        width: 100%;
+    }
+
+    body:has(#classSelectionForm) main.container {
+        width: calc(100% - 24px);
+        margin-top: 16px;
+    }
+
+    body:has(#classSelectionForm) .dashboard-heading h2 {
+        font-size: 23px;
+    }
+
+    body:has(#classSelectionForm) main.container > section.card {
+        padding: 16px;
+        margin-bottom: 14px;
+    }
+
+    body:has(#classSelectionForm) #classSelectionForm .marks-toolbar {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 13px;
+    }
+
+    body:has(#classSelectionForm) #classSelectionForm .marks-toolbar > div:last-child {
+        grid-column: auto;
+    }
+
+    body:has(#classSelectionForm) #classSelectionForm .marks-toolbar > div:last-child .btn {
+        width: 100%;
+    }
+
+    body:has(#classSelectionForm) .class-filter-form {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    body:has(#classSelectionForm) .class-filter-form select {
+        width: 100%;
+    }
+}
+
+/* ---------- Print ---------- */
+@media print {
+    header,
+    .no-print,
+    .btn {
+        display: none !important;
+    }
+
+    body {
+        background: white;
+    }
+
+    .container {
+        width: 100%;
+        margin: 0;
+    }
+
+    .card {
+        box-shadow: none;
+    }
+}
