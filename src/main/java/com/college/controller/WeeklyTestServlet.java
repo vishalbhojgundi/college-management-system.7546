@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
+import java.util.Set;
 
 @WebServlet("/weeklytest")
 public class WeeklyTestServlet extends HttpServlet {
@@ -37,7 +39,6 @@ public class WeeklyTestServlet extends HttpServlet {
         }
 
         String role = (String) session.getAttribute("role");
-
         return "ADMIN".equals(role) || "STAFF".equals(role);
     }
 
@@ -52,83 +53,86 @@ public class WeeklyTestServlet extends HttpServlet {
             return;
         }
 
-        String action = req.getParameter("action");
-
-        // Delete one weekly-test record.
-        if ("delete".equals(action)) {
-            String idValue = req.getParameter("id");
-
-            try {
-                int id = Integer.parseInt(idValue);
-                testDAO.deleteTest(id);
-
-            } catch (NumberFormatException e) {
-                resp.sendError(
-                        HttpServletResponse.SC_BAD_REQUEST,
-                        "Invalid test record ID"
-                );
-                return;
-            }
-
-            String filterClass = req.getParameter("filterClass");
-
-            if (filterClass != null && !filterClass.isEmpty()) {
-                resp.sendRedirect(
-                        req.getContextPath()
-                                + "/weeklytest?filterClass="
-                                + URLEncoder.encode(
-                                filterClass,
-                                StandardCharsets.UTF_8
-                        )
-                );
-            } else {
-                resp.sendRedirect(req.getContextPath() + "/weeklytest");
-            }
-
+        // Deletion must use POST, not GET.
+        if ("delete".equals(req.getParameter("action"))) {
+            resp.sendError(
+                    HttpServletResponse.SC_METHOD_NOT_ALLOWED,
+                    "Delete requires a POST request."
+            );
             return;
         }
 
-        /*
-         * Load every weekly-test record.
-         * Do not filter by test name here.
-         */
         List<WeeklyTest> allTests = testDAO.getAllTests();
+        List<Student> students = studentDAO.getAllStudents();
 
         String filterClass = req.getParameter("filterClass");
+        String filterTestId = req.getParameter("filterTestId");
 
+        if (filterClass == null || filterClass.trim().isEmpty()) {
+            filterClass = "all";
+        }
+
+        if (filterTestId == null) {
+            filterTestId = "all";
+        }
+
+        // Filter records using both selected class and test.
         List<WeeklyTest> filteredTests = new ArrayList<>();
 
         for (WeeklyTest test : allTests) {
 
-            boolean includeRecord =
-                    filterClass == null
-                            || filterClass.trim().isEmpty()
-                            || "all".equals(filterClass)
+            boolean matchesClass =
+                    "all".equals(filterClass)
                             || String.valueOf(test.getClassNo())
                             .equals(filterClass);
 
-            if (includeRecord) {
+            boolean matchesTest =
+                    "all".equals(filterTestId)
+                            || test.getTestId().equals(filterTestId);
+
+            if (matchesClass && matchesTest) {
                 filteredTests.add(test);
             }
         }
 
-        // All records are used when filling previously saved marks.
-        req.setAttribute("allTests", allTests);
+        // Test names available for the selected class.
+        Set<String> availableTests = new TreeSet<>();
 
-        // The table displays all tests belonging to the selected class.
+        for (WeeklyTest test : allTests) {
+            if ("all".equals(filterClass)
+                    || String.valueOf(test.getClassNo()).equals(filterClass)) {
+                availableTests.add(test.getTestId());
+            }
+        }
+
+        // If the chosen test does not belong to the selected class,
+        // reset the test filter.
+        if (!"all".equals(filterTestId)
+                && !availableTests.contains(filterTestId)) {
+            filterTestId = "all";
+            filteredTests.clear();
+
+            for (WeeklyTest test : allTests) {
+                if ("all".equals(filterClass)
+                        || String.valueOf(test.getClassNo())
+                        .equals(filterClass)) {
+                    filteredTests.add(test);
+                }
+            }
+        }
+
+        req.setAttribute("allTests", allTests);
         req.setAttribute("tests", filteredTests);
+        req.setAttribute("students", students);
+        req.setAttribute("availableTests", availableTests);
 
         req.setAttribute("filterClass", filterClass);
+        req.setAttribute("filterTestId", filterTestId);
 
-        // Load students for the bulk-entry form.
-        List<Student> students = studentDAO.getAllStudents();
-        req.setAttribute("students", students);
-
-        // Preserve bulk-entry selections.
+        // Preserve the bulk marks-entry selections.
         req.setAttribute("selectedClass", req.getParameter("classNo"));
         req.setAttribute("testId", req.getParameter("testId"));
 
-        // Display messages after saving marks.
         req.setAttribute("status", req.getParameter("status"));
 
         req.getRequestDispatcher("/admin/tests.jsp")
@@ -150,12 +154,69 @@ public class WeeklyTestServlet extends HttpServlet {
 
         String action = req.getParameter("action");
 
+        // Delete one saved weekly-test record.
+        if ("delete".equals(action)) {
+
+            // Restrict deletion to ADMIN accounts.
+            HttpSession session = req.getSession(false);
+
+            if (session == null
+                    || !"ADMIN".equals(session.getAttribute("role"))) {
+                resp.sendError(
+                        HttpServletResponse.SC_FORBIDDEN,
+                        "Only administrators can delete test records."
+                );
+                return;
+            }
+
+            String idValue = req.getParameter("id");
+            int id;
+
+            try {
+                id = Integer.parseInt(idValue);
+
+                if (id <= 0) {
+                    throw new NumberFormatException();
+                }
+            } catch (NumberFormatException e) {
+                resp.sendError(
+                        HttpServletResponse.SC_BAD_REQUEST,
+                        "Invalid test record ID."
+                );
+                return;
+            }
+
+            testDAO.deleteTest(id);
+
+            String filterClass = req.getParameter("filterClass");
+            String filterTestId = req.getParameter("filterTestId");
+
+            StringBuilder url = new StringBuilder(
+                    req.getContextPath() + "/weeklytest?filterClass="
+                            + URLEncoder.encode(
+                            filterClass == null ? "all" : filterClass,
+                            StandardCharsets.UTF_8)
+            );
+
+            if (filterTestId != null && !filterTestId.isEmpty()) {
+                url.append("&filterTestId=").append(
+                        URLEncoder.encode(
+                                filterTestId,
+                                StandardCharsets.UTF_8)
+                );
+            }
+
+            resp.sendRedirect(url.toString());
+            return;
+        }
+
+        // Save marks for multiple students.
         if ("bulkSave".equals(action)) {
             saveBulkMarks(req, resp);
             return;
         }
 
-        // Preserve the existing single-record actions.
+        // Existing single-record add/update actions.
         WeeklyTest test = new WeeklyTest();
 
         test.setTestId(req.getParameter("testId"));
@@ -166,7 +227,7 @@ public class WeeklyTestServlet extends HttpServlet {
         if (marks < 0 || marks > 100) {
             resp.sendError(
                     HttpServletResponse.SC_BAD_REQUEST,
-                    "Marks must be between 0 and 100"
+                    "Marks must be between 0 and 100."
             );
             return;
         }
@@ -189,7 +250,7 @@ public class WeeklyTestServlet extends HttpServlet {
             } catch (NumberFormatException e) {
                 resp.sendError(
                         HttpServletResponse.SC_BAD_REQUEST,
-                        "Invalid test record ID"
+                        "Invalid test record ID."
                 );
                 return;
             }
@@ -197,7 +258,7 @@ public class WeeklyTestServlet extends HttpServlet {
         } else {
             resp.sendError(
                     HttpServletResponse.SC_BAD_REQUEST,
-                    "Invalid weekly-test action"
+                    "Invalid weekly-test action."
             );
             return;
         }
@@ -250,7 +311,7 @@ public class WeeklyTestServlet extends HttpServlet {
 
                 String value = req.getParameter("marks_" + regNo);
 
-                // Skip blank fields.
+                // Blank marks are skipped.
                 if (value == null || value.trim().isEmpty()) {
                     continue;
                 }
@@ -306,8 +367,7 @@ public class WeeklyTestServlet extends HttpServlet {
                         + "/weeklytest?status="
                         + URLEncoder.encode(
                         status,
-                        StandardCharsets.UTF_8
-                )
+                        StandardCharsets.UTF_8)
         );
 
         if (classNo != null) {
@@ -318,8 +378,7 @@ public class WeeklyTestServlet extends HttpServlet {
             url.append("&testId=").append(
                     URLEncoder.encode(
                             testId,
-                            StandardCharsets.UTF_8
-                    )
+                            StandardCharsets.UTF_8)
             );
         }
 
