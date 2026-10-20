@@ -1,7 +1,5 @@
+
 package com.college.controller;
-import com.college.model.Student;
-import java.util.ArrayList;
-import java.util.List;
 
 import com.college.dao.CourseDAO;
 import com.college.dao.StudentDAO;
@@ -15,16 +13,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
-/**
- * Handles:
- * 1. View students
- * 2. Add student
- * 3. Update student
- * 4. Delete student
- *
- * Only ADMIN and STAFF can access this servlet.
- */
 @WebServlet("/student")
 public class StudentServlet extends HttpServlet {
 
@@ -33,9 +27,7 @@ public class StudentServlet extends HttpServlet {
     private final StudentDAO studentDAO = new StudentDAO();
     private final CourseDAO courseDAO = new CourseDAO();
 
-    /**
-     * Check whether the logged-in user is ADMIN or STAFF.
-     */
+    // Allow only logged-in ADMIN and STAFF users.
     private boolean isAuthorized(HttpServletRequest req) {
 
         HttpSession session = req.getSession(false);
@@ -49,79 +41,96 @@ public class StudentServlet extends HttpServlet {
         return "ADMIN".equals(role) || "STAFF".equals(role);
     }
 
-    /**
-     * GET requests:
-     *
-     * /student
-     *              -> Show all students
-     *
-     * /student?action=edit&regNo=...
-     *              -> Show student in edit mode
-     *
-     * /student?action=delete&regNo=...
-     *              -> Delete student
-     */
+    // Create or reuse the CSRF token stored in the session.
+    private String getOrCreateCsrfToken(HttpSession session) {
+
+        String token = (String) session.getAttribute("csrfToken");
+
+        if (token == null || token.trim().isEmpty()) {
+            token = UUID.randomUUID().toString();
+            session.setAttribute("csrfToken", token);
+        }
+
+        return token;
+    }
+
+    // Validate the submitted CSRF token.
+    private boolean isValidCsrfToken(
+            HttpServletRequest req,
+            HttpSession session) {
+
+        if (session == null) {
+            return false;
+        }
+
+        String expectedToken =
+                (String) session.getAttribute("csrfToken");
+
+        String submittedToken =
+                req.getParameter("csrfToken");
+
+        if (expectedToken == null || submittedToken == null) {
+            return false;
+        }
+
+        return MessageDigest.isEqual(
+                expectedToken.getBytes(StandardCharsets.UTF_8),
+                submittedToken.getBytes(StandardCharsets.UTF_8)
+        );
+    }
+
+    // GET: Display students and the edit form.
+    // GET requests never delete records.
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+    protected void doGet(
+            HttpServletRequest req,
+            HttpServletResponse resp)
             throws ServletException, IOException {
 
-        // Check login and role
         if (!isAuthorized(req)) {
             resp.sendRedirect(req.getContextPath() + "/login.jsp");
             return;
         }
 
+        HttpSession session = req.getSession(false);
+
+        req.setAttribute(
+                "csrfToken",
+                getOrCreateCsrfToken(session)
+        );
+
         String action = req.getParameter("action");
 
-        /*
-         * DELETE STUDENT
-         */
+        // An old GET delete URL must never delete anything.
         if ("delete".equals(action)) {
-
-            String regNo = req.getParameter("regNo");
-
-            if (regNo != null && !regNo.trim().isEmpty()) {
-                studentDAO.deleteStudent(regNo);
-            }
-
-            /*
-             * IMPORTANT:
-             * Do NOT redirect directly to students.jsp.
-             *
-             * Redirect to /student so that:
-             * - students are loaded
-             * - courses are loaded
-             * - JSP receives all required attributes
-             */
-            resp.sendRedirect(req.getContextPath() + "/student");
+            resp.sendError(
+                    HttpServletResponse.SC_METHOD_NOT_ALLOWED,
+                    "Student deletion requires a POST request."
+            );
             return;
         }
 
-        /*
-         * EDIT STUDENT
-         */
+        // Load the selected student for editing.
         if ("edit".equals(action)) {
 
             String regNo = req.getParameter("regNo");
 
             if (regNo != null && !regNo.trim().isEmpty()) {
-
-                Student student = studentDAO.getStudentByRegNo(regNo);
+                Student student =
+                        studentDAO.getStudentByRegNo(regNo.trim());
 
                 req.setAttribute("editStudent", student);
             }
         }
 
-        /*
-         * LOAD STUDENTS
-         */
-
+        // Load all students.
         List<Student> allStudents = studentDAO.getAllStudents();
 
         String selectedClass = req.getParameter("classNo");
 
         List<Student> displayedStudents = new ArrayList<>();
 
+        // Show every student when no class is selected.
         if (selectedClass == null
                 || selectedClass.trim().isEmpty()
                 || "all".equals(selectedClass)) {
@@ -134,6 +143,7 @@ public class StudentServlet extends HttpServlet {
                 int classNumber = Integer.parseInt(selectedClass);
 
                 if (classNumber >= 7 && classNumber <= 10) {
+
                     for (Student student : allStudents) {
                         if (student.getClassNo() == classNumber) {
                             displayedStudents.add(student);
@@ -142,158 +152,128 @@ public class StudentServlet extends HttpServlet {
                 }
 
             } catch (NumberFormatException e) {
-                // Invalid class selection: display no students.
+                // Invalid class selection: show no students.
             }
         }
 
         req.setAttribute("students", displayedStudents);
         req.setAttribute("selectedClass", selectedClass);
 
-        /*
-         * LOAD COURSES
-         *
-         * This is VERY IMPORTANT because students.jsp
-         * contains:
-         *
-         * for (Course c : courses)
-         */
-        req.setAttribute(
-                "courses",
-                courseDAO.getAllCourses()
-        );
+        // Load courses required by the JSP.
+        req.setAttribute("courses", courseDAO.getAllCourses());
 
-        /*
-         * Open the students JSP.
-         */
-        req.getRequestDispatcher(
-                "/admin/students.jsp"
-        ).forward(req, resp);
+        // Forward to the existing students page.
+        req.getRequestDispatcher("/admin/students.jsp")
+                .forward(req, resp);
     }
 
-    /**
-     * POST requests:
-     *
-     * action=add
-     *      -> Add student
-     *
-     * action=update
-     *      -> Update student
-     */
+    // POST: Add, update, or delete a student.
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+    protected void doPost(
+            HttpServletRequest req,
+            HttpServletResponse resp)
             throws ServletException, IOException {
 
-        // Check login and role
         if (!isAuthorized(req)) {
             resp.sendRedirect(req.getContextPath() + "/login.jsp");
             return;
         }
 
-        /*
-         * Get action from the form.
-         */
+        req.setCharacterEncoding("UTF-8");
+
         String action = req.getParameter("action");
 
-        /*
-         * Create Student object.
-         */
-        Student student = new Student();
+        // Handle deletion separately before creating a Student object.
+        if ("delete".equals(action)) {
 
-        student.setRegNo(
-                req.getParameter("regNo")
-        );
+            HttpSession session = req.getSession(false);
 
-        student.setName(
-                req.getParameter("name")
-        );
+            if (!isValidCsrfToken(req, session)) {
+                resp.sendError(
+                        HttpServletResponse.SC_FORBIDDEN,
+                        "Invalid security token. Refresh the page and try again."
+                );
+                return;
+            }
 
-        student.setClassNo(
-                parseIntSafe(req.getParameter("classNo"))
-        );
+            // Only ADMIN may delete students.
+            if (!"ADMIN".equals(session.getAttribute("role"))) {
+                resp.sendError(
+                        HttpServletResponse.SC_FORBIDDEN,
+                        "You are not permitted to delete students."
+                );
+                return;
+            }
 
-        student.setCourseId(
-                req.getParameter("courseId")
-        );
+            String regNo = req.getParameter("regNo");
 
-        student.setGender(
-                req.getParameter("gender")
-        );
+            if (regNo == null || regNo.trim().isEmpty()) {
+                resp.sendError(
+                        HttpServletResponse.SC_BAD_REQUEST,
+                        "Student registration number is required."
+                );
+                return;
+            }
 
-        student.setVillege(
-                req.getParameter("villege")
-        );
+            boolean deleted =
+                    studentDAO.deleteStudent(regNo.trim());
 
-        student.setPincode(
-                parseIntSafe(req.getParameter("pincode"))
-        );
+            if (!deleted) {
+                resp.sendError(
+                        HttpServletResponse.SC_NOT_FOUND,
+                        "Student was not deleted. The record may not exist."
+                );
+                return;
+            }
 
-        student.setState(
-                req.getParameter("state")
-        );
-
-        /*
-         * ADD STUDENT
-         */
-        if ("add".equals(action)) {
-
-            studentDAO.addStudent(student);
-        }
-
-        /*
-         * UPDATE STUDENT
-         */
-        else if ("update".equals(action)) {
-
-            studentDAO.updateStudent(student);
-        }
-
-        /*
-         * Unknown action
-         */
-        else {
-
-            resp.sendError(
-                    HttpServletResponse.SC_BAD_REQUEST,
-                    "Invalid student action"
-            );
-
+            resp.sendRedirect(req.getContextPath() + "/student");
             return;
         }
 
-        /*
-         * IMPORTANT:
-         *
-         * After adding/updating the student,
-         * redirect to /student instead of directly
-         * opening students.jsp.
-         *
-         * /student will load:
-         *
-         * students
-         * courses
-         *
-         * and then forward to students.jsp.
-         */
-        resp.sendRedirect(
-                req.getContextPath() + "/student"
-        );
+        // Preserve existing add and update functionality.
+        Student student = new Student();
+
+        student.setRegNo(req.getParameter("regNo"));
+        student.setName(req.getParameter("name"));
+        student.setClassNo(parseIntSafe(req.getParameter("classNo")));
+        student.setCourseId(req.getParameter("courseId"));
+        student.setGender(req.getParameter("gender"));
+        student.setVillege(req.getParameter("villege"));
+        student.setPincode(parseIntSafe(req.getParameter("pincode")));
+        student.setState(req.getParameter("state"));
+
+        if ("add".equals(action)) {
+
+            studentDAO.addStudent(student);
+
+        } else if ("update".equals(action)) {
+
+            studentDAO.updateStudent(student);
+
+        } else {
+
+            resp.sendError(
+                    HttpServletResponse.SC_BAD_REQUEST,
+                    "Invalid student action."
+            );
+            return;
+        }
+
+        // Reload the student list after adding or updating.
+        resp.sendRedirect(req.getContextPath() + "/student");
     }
 
-    /**
-     * Safely convert String to int.
-     */
+    // Safely convert form values to integers.
     private int parseIntSafe(String value) {
 
         try {
-
             if (value == null || value.trim().isEmpty()) {
                 return 0;
             }
 
-            return Integer.parseInt(value);
+            return Integer.parseInt(value.trim());
 
         } catch (NumberFormatException e) {
-
             return 0;
         }
     }

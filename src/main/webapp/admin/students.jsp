@@ -4,7 +4,6 @@
 <%@ page import="com.college.model.Course" %>
 <%@ page import="com.college.model.User" %>
 <%@ page import="java.util.List" %>
-<%@ page import="java.net.URLEncoder" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -23,8 +22,6 @@
     <script src="${pageContext.request.contextPath}/js/script.js" defer></script>
 
     <style>
-        /* Student Management page-specific styling */
-
         .students-page {
             max-width: 1320px;
         }
@@ -159,6 +156,7 @@
 
         .student-form-grid input,
         .student-form-grid select {
+            box-sizing: border-box;
             width: 100%;
             min-height: 43px;
             padding: 10px 12px;
@@ -236,6 +234,7 @@
         }
 
         .student-filter-form select {
+            box-sizing: border-box;
             width: min(280px, 100%);
             min-height: 40px;
             padding: 9px 12px;
@@ -322,6 +321,12 @@
             padding: 6px 10px;
             font-size: 12px;
             white-space: nowrap;
+            cursor: pointer;
+        }
+
+        .student-actions form {
+            display: inline;
+            margin: 0;
         }
 
         .empty-students {
@@ -473,6 +478,11 @@
     String dashboardPath = "ADMIN".equals(user.getRole())
             ? "admin"
             : "staff";
+
+    String csrfToken = (String) request.getAttribute("csrfToken");
+    if (csrfToken == null) {
+        csrfToken = "";
+    }
 %>
 
 <header>
@@ -639,6 +649,7 @@
 
                                 <option value="<%= c.getCourseId() %>"
                                     <%= isEdit
+                                            && c.getCourseId() != null
                                             && c.getCourseId().equals(editStudent.getCourseId())
                                             ? "selected"
                                             : "" %>>
@@ -821,17 +832,17 @@
             <table class="student-table">
 
                 <thead>
-                <tr>
-                    <th>Registration No.</th>
-                    <th>Student Name</th>
-                    <th>Class</th>
-                    <th>Course</th>
-                    <th>Gender</th>
-                    <th>Village</th>
-                    <th>Pincode</th>
-                    <th>State</th>
-                    <th>Actions</th>
-                </tr>
+                    <tr>
+                        <th>Registration No.</th>
+                        <th>Student Name</th>
+                        <th>Class</th>
+                        <th>Course</th>
+                        <th>Gender</th>
+                        <th>Village</th>
+                        <th>Pincode</th>
+                        <th>State</th>
+                        <th>Actions</th>
+                    </tr>
                 </thead>
 
                 <tbody>
@@ -879,15 +890,32 @@
                                 <div class="student-actions">
 
                                     <a class="btn btn-secondary"
-                                       href="${pageContext.request.contextPath}/student?action=edit&regNo=<%= URLEncoder.encode(s.getRegNo(), "UTF-8") %>">
+                                       href="${pageContext.request.contextPath}/student?action=edit&amp;regNo=<%= java.net.URLEncoder.encode(s.getRegNo(), "UTF-8") %>">
                                         Edit
                                     </a>
 
-                                    <a class="btn btn-danger delete-btn"
-                                       data-confirm="Delete this student?"
-                                       href="${pageContext.request.contextPath}/student?action=delete&regNo=<%= URLEncoder.encode(s.getRegNo(), "UTF-8") %>">
-                                        Delete
-                                    </a>
+                                    <!-- DELETE: POST request with CSRF token -->
+                                    <form action="${pageContext.request.contextPath}/student"
+                                          method="post"
+                                          onsubmit="return confirm('Are you sure you want to delete this student? This action cannot be undone.');">
+
+                                        <input type="hidden"
+                                               name="action"
+                                               value="delete">
+
+                                        <input type="hidden"
+                                               name="regNo"
+                                               value="<%= s.getRegNo() == null ? "" : s.getRegNo().replace("&", "&amp;").replace("\"", "&quot;").replace("<", "&lt;").replace(">", "&gt;") %>">
+
+                                        <input type="hidden"
+                                               name="csrfToken"
+                                               value="<%= csrfToken %>">
+
+                                        <button type="submit"
+                                                class="btn btn-danger">
+                                            Delete
+                                        </button>
+                                    </form>
 
                                 </div>
                             </td>
