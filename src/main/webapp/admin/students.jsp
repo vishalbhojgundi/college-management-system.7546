@@ -4,21 +4,19 @@
 <%@ page import="com.college.model.Course" %>
 <%@ page import="com.college.model.User" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.net.URLEncoder" %>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
     <title>Student Management | BTVP HIGH SCHOOL</title>
 
     <link rel="stylesheet"
           href="${pageContext.request.contextPath}/css/style.css">
-
     <link rel="stylesheet"
           href="${pageContext.request.contextPath}/css/admin-ui.css">
-
     <script src="${pageContext.request.contextPath}/js/script.js" defer></script>
 
     <style>
@@ -57,6 +55,8 @@
             font-size: 12px;
             font-weight: 800;
         }
+
+        /* Summary cards */
 
         .student-summary-grid {
             display: grid;
@@ -104,13 +104,15 @@
             line-height: 1.3;
         }
 
+        /* General panels */
+
         .student-panel {
             min-width: 0;
             margin-bottom: 24px;
             padding: 24px;
             background: #fff;
             border: 1px solid var(--border);
-            border-radius: 12px;
+            border-radius: 14px;
             box-shadow: var(--shadow);
         }
 
@@ -124,22 +126,64 @@
         }
 
         .student-panel-heading h3 {
-            margin: 0 0 5px;
-            color: var(--navy);
-            font-size: 19px;
+            margin: 0 0 7px;
+            color: #142b4a;
+            font-size: 20px;
+            font-weight: 750;
         }
 
         .student-panel-heading p {
             margin: 0;
             color: var(--muted);
             font-size: 13px;
+            line-height: 1.6;
+        }
+
+        /* Professional student form */
+
+        .student-form-panel {
+            padding: 30px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            box-shadow: 0 8px 28px rgba(15, 35, 70, 0.07);
+        }
+
+        .student-form-panel .student-panel-heading {
+            align-items: center;
+            padding-bottom: 22px;
+            margin-bottom: 26px;
+            border-bottom: 1px solid #e8edf5;
+        }
+
+        .student-form-panel .student-panel-heading h3 {
+            margin: 0 0 8px;
+            color: #142b4a;
+            font-size: 23px;
+            font-weight: 750;
+            letter-spacing: -0.4px;
+        }
+
+        .student-form-panel .student-panel-heading p {
+            margin: 0;
+            color: #718096;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .student-form-panel .class-badge {
+            padding: 8px 12px;
+            border: 1px solid #d5e3ff;
+            background: #eff5ff;
+            color: #2458a6;
+            letter-spacing: 0.4px;
         }
 
         .student-form-grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 18px 22px;
-            margin-bottom: 22px;
+            gap: 23px 26px;
+            margin-bottom: 28px;
         }
 
         .student-form-grid > div {
@@ -148,8 +192,8 @@
 
         .student-form-grid label {
             display: block;
-            margin-bottom: 7px;
-            color: #34445a;
+            margin-bottom: 9px;
+            color: #263b55;
             font-size: 13px;
             font-weight: 700;
         }
@@ -157,26 +201,40 @@
         .student-form-grid input,
         .student-form-grid select {
             box-sizing: border-box;
+            display: block;
             width: 100%;
-            min-height: 43px;
-            padding: 10px 12px;
-            border: 1px solid #cbd5e1;
-            border-radius: 7px;
+            min-height: 48px;
+            padding: 12px 14px;
+            border: 1px solid #d5deea;
+            border-radius: 9px;
+            outline: none;
             background: #fff;
-            color: var(--text);
-            font: inherit;
+            color: #1e293b;
+            font-family: inherit;
+            font-size: 14px;
+            transition: border-color .2s ease,
+                        box-shadow .2s ease,
+                        background-color .2s ease;
+        }
+
+        .student-form-grid input::placeholder {
+            color: #9aa8ba;
+        }
+
+        .student-form-grid input:hover,
+        .student-form-grid select:hover {
+            border-color: #a8bad4;
         }
 
         .student-form-grid input:focus,
         .student-form-grid select:focus {
-            outline: none;
-            border-color: var(--blue);
-            box-shadow: 0 0 0 3px rgba(40, 104, 215, .12);
+            border-color: #2868d7;
+            box-shadow: 0 0 0 4px rgba(40, 104, 215, .11);
         }
 
         .student-form-grid input[readonly] {
-            background: #f1f4f8;
-            color: var(--muted);
+            background: #f1f5f9;
+            color: #64748b;
             cursor: not-allowed;
         }
 
@@ -184,8 +242,54 @@
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            padding-top: 22px;
+            border-top: 1px solid #e8edf5;
         }
+
+        .student-form-actions .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            min-height: 46px;
+            padding: 12px 21px;
+            border: 1px solid transparent;
+            border-radius: 9px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color .2s ease,
+                        transform .2s ease,
+                        box-shadow .2s ease;
+        }
+
+        .student-form-actions .btn:not(.btn-secondary) {
+            background: #2868d7;
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(40, 104, 215, .18);
+        }
+
+        .student-form-actions .btn:not(.btn-secondary):hover {
+            background: #1e54b5;
+            box-shadow: 0 6px 14px rgba(40, 104, 215, .25);
+            transform: translateY(-1px);
+        }
+
+        .student-form-actions .btn-secondary {
+            border-color: #d9e2ee;
+            background: #fff;
+            color: #263b55;
+        }
+
+        .student-form-actions .btn-secondary:hover {
+            background: #f1f5f9;
+            border-color: #bdcadd;
+        }
+
+        /* Records panel and class filter */
 
         .records-panel {
             padding: 0;
@@ -250,6 +354,8 @@
             color: var(--muted);
             font-size: 12px;
         }
+
+        /* Responsive student table */
 
         .student-table-wrapper {
             width: 100%;
@@ -316,17 +422,17 @@
             gap: 6px;
         }
 
+        .student-actions form {
+            display: inline;
+            margin: 0;
+        }
+
         .student-actions .btn {
             min-height: 32px;
             padding: 6px 10px;
             font-size: 12px;
             white-space: nowrap;
             cursor: pointer;
-        }
-
-        .student-actions form {
-            display: inline;
-            margin: 0;
         }
 
         .empty-students {
@@ -350,9 +456,36 @@
             font-size: 12px;
         }
 
+        /* Responsive layout */
+
         @media (max-width: 850px) {
             .student-summary-grid {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 650px) {
+            .student-form-panel {
+                padding: 20px;
+                border-radius: 12px;
+            }
+
+            .student-form-panel .student-panel-heading h3 {
+                font-size: 20px;
+            }
+
+            .student-form-grid {
+                grid-template-columns: minmax(0, 1fr);
+                gap: 19px;
+            }
+
+            .student-form-actions {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .student-form-actions .btn {
+                width: 100%;
             }
         }
 
@@ -366,13 +499,16 @@
                 font-size: 23px;
             }
 
-            .student-summary-grid,
-            .student-form-grid {
+            .student-summary-grid {
                 grid-template-columns: 1fr;
             }
 
             .student-panel {
                 padding: 17px;
+            }
+
+            .student-form-panel {
+                padding: 20px;
             }
 
             .records-panel {
@@ -445,7 +581,6 @@
     if (user == null
             || !("ADMIN".equals(user.getRole())
             || "STAFF".equals(user.getRole()))) {
-
         response.sendRedirect(request.getContextPath() + "/login.jsp");
         return;
     }
@@ -471,13 +606,8 @@
     int studentCount = students == null ? 0 : students.size();
     int courseCount = courses == null ? 0 : courses.size();
 
-    String roleLabel = "ADMIN".equals(user.getRole())
-            ? "ADMIN"
-            : "STAFF";
-
-    String dashboardPath = "ADMIN".equals(user.getRole())
-            ? "admin"
-            : "staff";
+    String roleLabel = "ADMIN".equals(user.getRole()) ? "ADMIN" : "STAFF";
+    String dashboardPath = "ADMIN".equals(user.getRole()) ? "admin" : "staff";
 
     String csrfToken = (String) request.getAttribute("csrfToken");
     if (csrfToken == null) {
@@ -519,14 +649,10 @@
     <section class="student-page-heading">
         <div>
             <h2>Student Management</h2>
-            <p>
-                Manage student profiles, academic details and class-wise records.
-            </p>
+            <p>Manage student profiles, academic details and class-wise records.</p>
         </div>
 
-        <span class="role-badge">
-            ● <%= roleLabel %> ACCESS
-        </span>
+        <span class="role-badge">● <%= roleLabel %> ACCESS</span>
     </section>
 
     <!-- SUMMARY CARDS -->
@@ -590,7 +716,6 @@
 
                 <div>
                     <label for="regNo">Registration Number *</label>
-
                     <input id="regNo"
                            type="text"
                            name="regNo"
@@ -603,7 +728,6 @@
 
                 <div>
                     <label for="name">Student Name *</label>
-
                     <input id="name"
                            type="text"
                            name="name"
@@ -615,63 +739,42 @@
 
                 <div>
                     <label for="studentClass">Class *</label>
-
-                    <select id="studentClass"
-                            name="classNo"
-                            required>
-
+                    <select id="studentClass" name="classNo" required>
                         <option value="">Select class</option>
 
                         <% for (int c = 7; c <= 10; c++) { %>
                             <option value="<%= c %>"
-                                <%= isEdit
-                                        && editStudent.getClassNo() == c
-                                        ? "selected"
-                                        : "" %>>
+                                <%= isEdit && editStudent.getClassNo() == c
+                                        ? "selected" : "" %>>
                                 Class <%= c %>
                             </option>
                         <% } %>
-
                     </select>
                 </div>
 
                 <div>
                     <label for="courseId">Course *</label>
-
-                    <select id="courseId"
-                            name="courseId"
-                            required>
-
+                    <select id="courseId" name="courseId" required>
                         <option value="">Select course</option>
 
                         <% if (courses != null) {
                             for (Course c : courses) { %>
-
                                 <option value="<%= c.getCourseId() %>"
                                     <%= isEdit
                                             && c.getCourseId() != null
                                             && c.getCourseId().equals(editStudent.getCourseId())
-                                            ? "selected"
-                                            : "" %>>
-
+                                            ? "selected" : "" %>>
                                     <%= c.getCourseName() %>
                                     (<%= c.getCourseId() %>)
-
                                 </option>
-
                         <%  }
                         } %>
-
                     </select>
                 </div>
 
                 <div>
                     <label for="gender">Gender *</label>
-
-                    <select id="gender"
-                            name="gender"
-                            required>
-
+                    <select id="gender" name="gender" required>
                         <option value="">Select gender</option>
 
                         <option value="Male"
@@ -691,13 +794,11 @@
                                     ? "selected" : "" %>>
                             Other
                         </option>
-
                     </select>
                 </div>
 
                 <div>
                     <label for="villege">Village *</label>
-
                     <input id="villege"
                            type="text"
                            name="villege"
@@ -709,12 +810,11 @@
 
                 <div>
                     <label for="pincode">Pincode *</label>
-
                     <input id="pincode"
                            type="number"
                            name="pincode"
                            value="<%= isEdit ? editStudent.getPincode() : "" %>"
-                           placeholder="6-digit pincode"
+                           placeholder="Enter 6-digit pincode"
                            min="100000"
                            max="999999"
                            required>
@@ -722,7 +822,6 @@
 
                 <div>
                     <label for="state">State *</label>
-
                     <input id="state"
                            type="text"
                            name="state"
@@ -741,22 +840,17 @@
                 </button>
 
                 <% if (isEdit) { %>
-
                     <a class="btn btn-secondary"
                        href="${pageContext.request.contextPath}/student">
                         Cancel
                     </a>
-
                 <% } else { %>
-
                     <button type="reset" class="btn btn-secondary">
                         Clear Form
                     </button>
-
                 <% } %>
 
             </div>
-
         </form>
     </section>
 
@@ -764,32 +858,25 @@
     <section class="student-panel records-panel">
 
         <div class="records-panel-heading">
-
             <div class="student-panel-heading">
                 <div>
                     <h3>Student Records</h3>
-                    <p>
-                        View and manage student details by class.
-                    </p>
+                    <p>View and manage student details by class.</p>
                 </div>
 
                 <span class="records-count">
                     <%= studentCount %> record(s)
                 </span>
             </div>
-
         </div>
 
         <!-- CLASS FILTER -->
         <div class="student-filter-panel">
-
             <form action="${pageContext.request.contextPath}/student"
                   method="get"
                   class="student-filter-form">
 
-                <label for="classFilter">
-                    Filter by class
-                </label>
+                <label for="classFilter">Filter by class</label>
 
                 <select name="classNo"
                         id="classFilter"
@@ -801,34 +888,26 @@
                     </option>
 
                     <% for (int c = 7; c <= 10; c++) { %>
-
                         <option value="<%= c %>"
                             <%= String.valueOf(c).equals(selectedClass)
-                                    ? "selected"
-                                    : "" %>>
+                                    ? "selected" : "" %>>
                             Class <%= c %>
                         </option>
-
                     <% } %>
-
                 </select>
 
                 <noscript>
-                    <button type="submit" class="btn">
-                        Apply Filter
-                    </button>
+                    <button type="submit" class="btn">Apply Filter</button>
                 </noscript>
 
                 <span class="filter-hint">
                     Classes 7–10 · Student directory
                 </span>
-
             </form>
         </div>
 
-        <!-- RESPONSIVE TABLE -->
+        <!-- RESPONSIVE STUDENT TABLE -->
         <div class="student-table-wrapper">
-
             <table class="student-table">
 
                 <thead>
@@ -848,11 +927,11 @@
                 <tbody>
 
                 <% if (students == null || students.isEmpty()) { %>
-
                     <tr>
                         <td colspan="9" class="empty-students">
                             <strong>No students found</strong>
-                            Try selecting another class or add a student using the form above.
+                            Try selecting another class or add a student using
+                            the form above.
                         </td>
                     </tr>
 
@@ -860,7 +939,6 @@
                     for (Student s : students) { %>
 
                         <tr>
-
                             <td class="student-regno">
                                 <%= s.getRegNo() %>
                             </td>
@@ -890,11 +968,11 @@
                                 <div class="student-actions">
 
                                     <a class="btn btn-secondary"
-                                       href="${pageContext.request.contextPath}/student?action=edit&amp;regNo=<%= java.net.URLEncoder.encode(s.getRegNo(), "UTF-8") %>">
+                                       href="${pageContext.request.contextPath}/student?action=edit&amp;regNo=<%= URLEncoder.encode(s.getRegNo(), "UTF-8") %>">
                                         Edit
                                     </a>
 
-                                    <!-- DELETE: POST request with CSRF token -->
+                                    <!-- Secure deletion form -->
                                     <form action="${pageContext.request.contextPath}/student"
                                           method="post"
                                           onsubmit="return confirm('Are you sure you want to delete this student? This action cannot be undone.');">
@@ -919,16 +997,13 @@
 
                                 </div>
                             </td>
-
                         </tr>
 
                     <% }
                 } %>
 
                 </tbody>
-
             </table>
-
         </div>
 
         <div class="records-footer">
@@ -937,7 +1012,6 @@
         </div>
 
     </section>
-
 </main>
 
 </body>
