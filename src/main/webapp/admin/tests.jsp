@@ -6,309 +6,381 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Set" %>
 <%@ page import="java.util.TreeSet" %>
-<%@ page import="java.net.URLEncoder" %>
-<%@ page import="java.nio.charset.StandardCharsets" %>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
     <title>Weekly Tests | BTVP HIGH SCHOOL</title>
 
-    <link rel="stylesheet"
-          href="${pageContext.request.contextPath}/css/style.css">
-
-    <link rel="stylesheet"
-          href="${pageContext.request.contextPath}/css/admin-ui.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin-ui.css">
 
     <style>
-        .weekly-page {
-            max-width: 1450px;
+        :root {
+            --weekly-navy: #17365d;
+            --weekly-blue: #2868d7;
+            --weekly-blue-hover: #1d54b5;
+            --weekly-page: #f2f5fb;
+            --weekly-border: #dfe7f2;
+            --weekly-muted: #70829b;
         }
 
-        .weekly-heading {
+        body {
+            background: var(--weekly-page);
+        }
+
+        .weekly-page {
+            width: min(1500px, calc(100% - 60px));
+            margin: 28px auto 45px;
+        }
+
+        .weekly-page-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
-            gap: 16px;
-            margin-bottom: 24px;
+            gap: 15px;
+            margin-bottom: 25px;
         }
 
-        .weekly-heading h2 {
-            margin: 0 0 7px;
-            color: var(--navy);
+        .weekly-page-header h2 {
+            margin: 0 0 5px;
+            color: var(--weekly-navy);
             font-size: 28px;
             font-weight: 800;
+            letter-spacing: -.45px;
         }
 
-        .weekly-heading p {
+        .weekly-page-header p {
             margin: 0;
-            color: var(--muted);
+            color: var(--weekly-muted);
+            font-size: 14px;
         }
 
-        .weekly-section {
-            margin-bottom: 25px;
-            padding: 26px;
+        .grading-info {
+            padding: 9px 13px;
+            border: 1px solid #d6e5ff;
+            border-radius: 9px;
+            background: #edf4ff;
+            color: #28559a;
+            font-size: 12px;
+            font-weight: 750;
+        }
+
+        .weekly-card {
+            margin-bottom: 24px;
+            padding: 29px 32px;
+            border: 1px solid var(--weekly-border);
+            border-radius: 17px;
             background: #fff;
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            box-shadow: var(--shadow);
+            box-shadow: 0 7px 24px rgba(23, 54, 93, .045);
         }
 
-        .weekly-section h2 {
-            margin-top: 0;
-            margin-bottom: 10px;
-            color: var(--navy);
-            font-size: 22px;
+        .weekly-card-title {
+            margin: 0 0 9px;
+            color: var(--weekly-navy);
+            font-size: 23px;
+            font-weight: 800;
+            letter-spacing: -.3px;
         }
 
-        .section-description {
-            margin: 0 0 22px;
-            color: var(--muted);
-            line-height: 1.6;
+        .weekly-card-description {
+            margin: 0 0 23px;
+            color: var(--weekly-muted);
+            font-size: 14px;
+            line-height: 1.65;
         }
 
-        .marks-toolbar {
+        /* Class-wise marks entry */
+
+        .entry-grid {
             display: grid;
             grid-template-columns: minmax(0, 1.5fr)
-                                   minmax(180px, 1fr)
-                                   auto;
+                                   minmax(210px, 1fr)
+                                   195px;
             align-items: end;
-            gap: 18px;
+            gap: 21px;
         }
 
-        .marks-toolbar > div {
-            min-width: 0;
-        }
-
-        .marks-toolbar label,
-        .filter-label {
+        .field label,
+        .filter-field label {
             display: block;
-            margin-bottom: 9px;
-            color: #263b55;
+            margin-bottom: 10px;
+            color: #263c59;
             font-size: 13px;
             font-weight: 750;
         }
 
-        .marks-toolbar input,
-        .marks-toolbar select,
-        .weekly-filter select {
+        .field input,
+        .field select,
+        .filter-field select {
             box-sizing: border-box;
+            display: block;
             width: 100%;
-            min-height: 48px;
-            padding: 12px 14px;
-            border: 1px solid #d5deea;
-            border-radius: 9px;
-            background: #fff;
-            color: #1e293b;
-            font: inherit;
+            min-height: 57px;
+            padding: 13px 15px;
+            border: 1px solid #d1ddeb;
+            border-radius: 10px;
             outline: none;
-            transition: border-color .2s ease,
-                        box-shadow .2s ease;
+            background: #fff;
+            color: #24354d;
+            font-family: inherit;
+            font-size: 15px;
+            transition: border-color .2s ease, box-shadow .2s ease;
         }
 
-        .marks-toolbar input:focus,
-        .marks-toolbar select:focus,
-        .weekly-filter select:focus {
-            border-color: #2868d7;
-            box-shadow: 0 0 0 4px rgba(40, 104, 215, .11);
+        .field input::placeholder {
+            color: #8998ac;
         }
 
-        .marks-toolbar .btn {
+        .field input:focus,
+        .field select:focus,
+        .filter-field select:focus {
+            border-color: var(--weekly-blue);
+            box-shadow: 0 0 0 4px rgba(40, 104, 215, .10);
+        }
+
+        .weekly-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
             min-height: 48px;
-            padding: 12px 22px;
-            white-space: nowrap;
+            padding: 12px 21px;
+            border: 1px solid transparent;
+            border-radius: 9px;
+            background: var(--weekly-blue);
+            color: #fff;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 750;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background .2s ease, transform .2s ease;
         }
 
-        .weekly-section .btn {
-            border-radius: 8px;
-            font-weight: 700;
-            cursor: pointer;
+        .weekly-btn:hover {
+            background: var(--weekly-blue-hover);
+            color: #fff;
         }
+
+        .entry-grid .weekly-btn {
+            width: 100%;
+            min-height: 57px;
+        }
+
+        /* Status messages */
 
         .status-message {
-            margin-bottom: 18px;
+            margin-bottom: 20px;
             padding: 14px 17px;
-            border: 1px solid #d8e4f4;
-            border-radius: 9px;
-            background: #f4f8ff;
-            color: #24466f;
+            border: 1px solid #d7e4f5;
+            border-radius: 10px;
+            background: #f1f6ff;
+            color: #244a7b;
+            font-size: 14px;
         }
 
         .status-success {
-            border-color: #b9e7cb;
-            background: #effbf3;
-            color: #16713a;
+            border-color: #b8e4c8;
+            background: #effaf3;
+            color: #177341;
         }
 
         .status-error {
-            border-color: #f1c4c4;
+            border-color: #f0c6c6;
             background: #fff2f2;
-            color: #a82121;
+            color: #ae2929;
         }
+
+        /* Saved-record filters */
 
         .weekly-filter {
             display: grid;
-            grid-template-columns: minmax(170px, 0.7fr)
-                                   minmax(220px, 1.2fr)
-                                   auto;
+            grid-template-columns: minmax(200px, .75fr)
+                                   minmax(260px, 1.25fr)
+                                   154px;
             align-items: end;
-            gap: 15px;
-            margin: 18px 0 22px;
-            padding: 19px;
-            border: 1px solid #e0e8f3;
-            border-radius: 10px;
-            background: #f8faff;
+            gap: 19px;
+            margin: 0 0 27px;
+            padding: 25px;
+            border: 1px solid #e0e9f6;
+            border-radius: 12px;
+            background: #f7f9fe;
         }
 
-        .weekly-filter > div {
+        .filter-field {
             min-width: 0;
         }
 
-        .weekly-filter label {
-            display: block;
-            margin-bottom: 8px;
-            color: #263b55;
-            font-size: 13px;
-            font-weight: 750;
+        .filter-field select {
+            min-height: 62px;
+            font-size: 15px;
         }
 
-        .weekly-filter .btn {
-            min-height: 45px;
-            padding: 11px 20px;
-            white-space: nowrap;
+        .weekly-filter .weekly-btn {
+            width: 100%;
+            min-height: 59px;
+            padding: 12px 15px;
         }
 
-        .filter-count {
-            margin-bottom: 15px;
-            color: var(--muted);
-            font-size: 13px;
+        .record-count {
+            margin: 0 0 19px;
+            color: var(--weekly-muted);
+            font-size: 14px;
         }
 
-        .filter-count strong {
-            color: var(--navy);
+        .record-count strong {
+            color: var(--weekly-navy);
+            font-weight: 800;
         }
 
-        .table-wrapper {
+        /* Tables */
+
+        .table-scroll {
             width: 100%;
             overflow-x: auto;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
+            border: 1px solid #e1e8f2;
+            border-radius: 11px;
         }
 
-        .table-wrapper table {
+        .weekly-table {
             width: 100%;
-            min-width: 850px;
+            min-width: 900px;
             border-collapse: collapse;
             background: #fff;
         }
 
-        .table-wrapper thead {
+        .weekly-table thead {
             background: #edf2f9;
         }
 
-        .table-wrapper th {
-            padding: 15px 16px;
-            color: var(--navy);
+        .weekly-table th {
+            padding: 18px 16px;
+            color: #183759;
             text-align: left;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 800;
             white-space: nowrap;
         }
 
-        .table-wrapper td {
-            padding: 14px 16px;
-            border-top: 1px solid #e8edf5;
-            color: #334155;
-            font-size: 13px;
+        .weekly-table td {
+            padding: 16px;
+            border-top: 1px solid #e9eef6;
+            color: #34445b;
+            font-size: 14px;
             vertical-align: middle;
         }
 
-        .table-wrapper tbody tr:nth-child(even) {
+        .weekly-table tbody tr:nth-child(even) {
             background: #f8faff;
         }
 
-        .table-wrapper tbody tr:hover {
+        .weekly-table tbody tr:hover {
             background: #f0f5ff;
         }
 
-        .bulk-marks-table {
-            min-width: 700px !important;
+        .test-name {
+            min-width: 200px;
+            color: #17365d !important;
+            font-weight: 750;
         }
 
-        .bulk-marks-table input[type="number"] {
-            box-sizing: border-box;
-            width: 105px;
-            min-height: 39px;
-            padding: 8px 10px;
-            border: 1px solid #cbd5e1;
-            border-radius: 7px;
-            font: inherit;
+        .student-name {
+            min-width: 145px;
         }
 
-        .bulk-marks-table input[type="number"]:focus {
-            border-color: #2868d7;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(40, 104, 215, .1);
-        }
-
-        .pass-mark,
-        .fail-mark {
+        .class-pill {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 6px 11px;
+            padding: 8px 13px;
             border-radius: 30px;
-            font-size: 11px;
-            font-weight: 850;
-            white-space: nowrap;
-        }
-
-        .pass-mark {
-            background: #e6f7ed;
-            color: #168046;
-        }
-
-        .fail-mark {
-            background: #fff0f0;
-            color: #c62828;
-        }
-
-        .class-badge {
-            display: inline-block;
-            padding: 6px 11px;
-            border-radius: 30px;
-            background: #eaf1ff;
-            color: #214f9b;
+            background: #e8f0ff;
+            color: #24529b;
             font-size: 12px;
             font-weight: 800;
             white-space: nowrap;
         }
 
-        .test-name-cell {
-            min-width: 180px;
-            color: var(--navy) !important;
-            font-weight: 750;
+        .result-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 58px;
+            padding: 7px 11px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 850;
         }
 
-        .student-name-cell {
-            min-width: 130px;
+        .result-pass {
+            background: #e6f7ed;
+            color: #148044;
+        }
+
+        .result-fail {
+            background: #fff0f0;
+            color: #c62828;
+        }
+
+        .delete-form {
+            display: inline;
+            margin: 0;
+        }
+
+        .delete-btn {
+            min-height: 40px;
+            padding: 9px 15px;
+            border: 0;
+            border-radius: 9px;
+            background: #d83232;
+            color: #fff;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 750;
+            cursor: pointer;
+        }
+
+        .delete-btn:hover {
+            background: #b91c1c;
         }
 
         .empty-records {
-            padding: 35px 20px !important;
-            color: var(--muted) !important;
+            padding: 45px 20px !important;
             text-align: center;
+            color: var(--weekly-muted) !important;
         }
 
         .empty-records strong {
             display: block;
-            margin-bottom: 5px;
-            color: var(--navy);
-            font-size: 15px;
+            margin-bottom: 6px;
+            color: var(--weekly-navy);
+            font-size: 16px;
+        }
+
+        /* Bulk marks entry */
+
+        .bulk-table {
+            min-width: 740px;
+        }
+
+        .bulk-table input[type="number"] {
+            box-sizing: border-box;
+            width: 110px;
+            min-height: 40px;
+            padding: 8px 11px;
+            border: 1px solid #cbd7e6;
+            border-radius: 8px;
+            outline: none;
+            font: inherit;
+        }
+
+        .bulk-table input[type="number"]:focus {
+            border-color: var(--weekly-blue);
+            box-shadow: 0 0 0 3px rgba(40, 104, 215, .1);
         }
 
         .bulk-actions {
@@ -317,50 +389,34 @@
             justify-content: space-between;
             flex-wrap: wrap;
             gap: 15px;
-            margin-top: 20px;
+            margin-top: 22px;
         }
 
         .bulk-actions p {
             margin: 0;
-            color: var(--muted);
+            color: var(--weekly-muted);
             font-size: 13px;
         }
 
-        .bulk-actions .btn {
-            min-height: 44px;
-            padding: 11px 21px;
+        .save-btn {
+            background: #16834b;
         }
 
-        .delete-form {
-            display: inline;
-            margin: 0;
+        .save-btn:hover {
+            background: #116b3d;
         }
 
-        .delete-form .btn {
-            min-height: 35px;
-            padding: 8px 13px;
-            border: 0;
-            border-radius: 8px;
-            background: #d83232;
-            color: #fff;
+        .admin-only {
+            color: var(--weekly-muted);
             font-size: 12px;
         }
 
-        .delete-form .btn:hover {
-            background: #b91c1c;
-        }
-
-        .admin-only-label {
-            color: var(--muted);
-            font-size: 12px;
-        }
-
-        @media (max-width: 850px) {
-            .marks-toolbar {
+        @media (max-width: 1000px) {
+            .entry-grid {
                 grid-template-columns: 1fr 1fr;
             }
 
-            .marks-toolbar > div:last-child {
+            .entry-grid > div:last-child {
                 grid-column: 1 / -1;
             }
 
@@ -373,31 +429,38 @@
             }
         }
 
-        @media (max-width: 600px) {
+        @media (max-width: 650px) {
             .weekly-page {
                 width: calc(100% - 24px);
+                margin-top: 18px;
             }
 
-            .weekly-section {
-                padding: 18px;
+            .weekly-card {
+                padding: 20px;
+                border-radius: 12px;
             }
 
-            .weekly-heading h2 {
+            .weekly-card-title {
+                font-size: 20px;
+            }
+
+            .weekly-page-header h2 {
                 font-size: 23px;
             }
 
-            .marks-toolbar,
+            .entry-grid,
             .weekly-filter {
-                grid-template-columns: 1fr;
+                grid-template-columns: minmax(0, 1fr);
+                gap: 17px;
             }
 
-            .marks-toolbar > div:last-child,
+            .entry-grid > div:last-child,
             .weekly-filter > div:last-child {
                 grid-column: auto;
             }
 
-            .marks-toolbar .btn,
-            .weekly-filter .btn {
+            .entry-grid .weekly-btn,
+            .weekly-filter .weekly-btn {
                 width: 100%;
             }
 
@@ -406,8 +469,28 @@
                 flex-direction: column;
             }
 
-            .bulk-actions .btn {
+            .bulk-actions .weekly-btn {
                 width: 100%;
+            }
+        }
+
+        @media print {
+            header,
+            .weekly-page-header,
+            .entry-card,
+            .weekly-filter,
+            .delete-form,
+            .bulk-actions {
+                display: none !important;
+            }
+
+            body {
+                background: #fff;
+            }
+
+            .weekly-card {
+                border: 0;
+                box-shadow: none;
             }
         }
     </style>
@@ -420,9 +503,9 @@
             ? (User) session.getAttribute("user")
             : null;
 
-    if (user == null
-            || !("ADMIN".equals(user.getRole())
-            || "STAFF".equals(user.getRole()))) {
+    if (user == null ||
+            !("ADMIN".equals(user.getRole()) ||
+              "STAFF".equals(user.getRole()))) {
         response.sendRedirect(request.getContextPath() + "/login.jsp");
         return;
     }
@@ -453,8 +536,8 @@
 
     String status = request.getParameter("status");
 
-    if (testIdValue == null) testIdValue = "";
     if (selectedClass == null) selectedClass = "";
+    if (testIdValue == null) testIdValue = "";
     if (filterClass == null || filterClass.trim().isEmpty()) {
         filterClass = "all";
     }
@@ -487,7 +570,8 @@
         validSelectedClass = false;
     }
 
-    String safeTestId = testIdValue.replace("&", "&amp;")
+    String safeTestId = testIdValue
+            .replace("&", "&amp;")
             .replace("\"", "&quot;")
             .replace("<", "&lt;")
             .replace(">", "&gt;");
@@ -513,27 +597,28 @@
     </nav>
 </header>
 
-<main class="container weekly-page">
+<main class="weekly-page">
 
-    <section class="weekly-heading">
+    <!-- PAGE HEADING -->
+    <section class="weekly-page-header">
         <div>
             <h2>Weekly Test Management</h2>
-            <p>Enter marks class-wise and review saved test records.</p>
+            <p>Manage class-wise marks and review saved test records.</p>
         </div>
 
-        <span class="badge badge-primary">
-            PASS: 40–100 · FAIL: 0–39
+        <span class="grading-info">
+            PASS: 40–100 &nbsp;·&nbsp; FAIL: 0–39
         </span>
     </section>
 
     <!-- STATUS MESSAGES -->
     <% if ("saved".equals(status)) { %>
         <div class="status-message status-success">
-            Marks saved successfully. Existing marks were updated; blank marks were skipped.
+            Marks saved successfully. Existing marks were updated and blank marks were skipped.
         </div>
     <% } else if ("saveFailed".equals(status)) { %>
         <div class="status-message status-error">
-            Marks could not be saved. Check the server console and database connection.
+            Marks could not be saved. Please check the server console and database connection.
         </div>
     <% } else if ("invalidClass".equals(status)
             || "invalidInput".equals(status)
@@ -548,20 +633,20 @@
     <% } %>
 
     <!-- SECTION 1: CLASS-WISE MARKS ENTRY -->
-    <section class="weekly-section">
+    <section class="weekly-card entry-card">
 
-        <h2>① Class-wise Marks Entry</h2>
-        <p class="section-description">
+        <h2 class="weekly-card-title">① Class-wise Marks Entry</h2>
+
+        <p class="weekly-card-description">
             Enter a test name and select a class to load students for marks entry.
         </p>
 
         <form action="${pageContext.request.contextPath}/weeklytest"
-              method="get"
-              id="classSelectionForm">
+              method="get">
 
-            <div class="marks-toolbar">
+            <div class="entry-grid">
 
-                <div>
+                <div class="field">
                     <label for="testId">Test Name / Test ID</label>
                     <input type="text"
                            id="testId"
@@ -572,7 +657,7 @@
                            required>
                 </div>
 
-                <div>
+                <div class="field">
                     <label for="classNo">Select Class</label>
                     <select id="classNo" name="classNo" required>
                         <option value="">Select class</option>
@@ -588,7 +673,7 @@
                 </div>
 
                 <div>
-                    <button type="submit" class="btn">
+                    <button type="submit" class="weekly-btn">
                         Load Students
                     </button>
                 </div>
@@ -597,14 +682,16 @@
         </form>
     </section>
 
-    <!-- SECTION 2: ENTER MARKS -->
+    <!-- SECTION 2: BULK MARKS ENTRY -->
     <% if (validSelectedClass && !testIdValue.trim().isEmpty()) { %>
 
-        <section class="weekly-section">
+        <section class="weekly-card">
 
-            <h2>② Enter Marks — Class <%= selectedClassNo %></h2>
+            <h2 class="weekly-card-title">
+                ② Enter Marks — Class <%= selectedClassNo %>
+            </h2>
 
-            <p class="section-description">
+            <p class="weekly-card-description">
                 Test: <strong><%= safeTestId %></strong>.
                 Leave a mark blank if it is not available yet.
             </p>
@@ -616,9 +703,8 @@
                 <input type="hidden" name="testId" value="<%= safeTestId %>">
                 <input type="hidden" name="classNo" value="<%= selectedClassNo %>">
 
-                <div class="table-wrapper">
-                    <table class="bulk-marks-table">
-
+                <div class="table-scroll">
+                    <table class="weekly-table bulk-table">
                         <thead>
                         <tr>
                             <th>No.</th>
@@ -630,13 +716,11 @@
                         </thead>
 
                         <tbody>
-
                         <%
                             int serial = 0;
 
                             if (students != null) {
                                 for (Student s : students) {
-
                                     if (s.getClassNo() != selectedClassNo) {
                                         continue;
                                     }
@@ -644,21 +728,17 @@
                                     serial++;
                                     String currentMarks = "";
 
-                                    // Use ALL records to populate existing marks,
-                                    // regardless of the saved-records filter.
                                     if (allTests != null) {
                                         for (WeeklyTest existing : allTests) {
                                             if (testIdValue.equals(existing.getTestId())
                                                     && s.getRegNo().equals(existing.getRegNo())
                                                     && existing.getClassNo() == selectedClassNo) {
-                                                currentMarks =
-                                                        String.valueOf(existing.getMarks());
+                                                currentMarks = String.valueOf(existing.getMarks());
                                                 break;
                                             }
                                         }
                                     }
                         %>
-
                             <tr>
                                 <td><%= serial %></td>
 
@@ -686,18 +766,15 @@
                                 <td class="result-cell">
                                     <% if (!currentMarks.isEmpty()) {
                                         int mark = Integer.parseInt(currentMarks); %>
-
-                                        <span class="<%= mark < 40
-                                                ? "fail-mark" : "pass-mark" %>">
+                                        <span class="result-pill <%= mark < 40
+                                                ? "result-fail" : "result-pass" %>">
                                             <%= mark < 40 ? "FAIL" : "PASS" %>
                                         </span>
-
                                     <% } else { %>
                                         —
                                     <% } %>
                                 </td>
                             </tr>
-
                         <%
                                 }
                             }
@@ -706,23 +783,21 @@
                         %>
                             <tr>
                                 <td colspan="5" class="empty-records">
-                                    No students found in this class.
+                                    <strong>No students found</strong>
+                                    There are no students in this class.
                                 </td>
                             </tr>
                         <% } %>
-
                         </tbody>
                     </table>
                 </div>
 
                 <% if (serial > 0) { %>
                     <div class="bulk-actions">
-                        <p>
-                            <strong>Total students:</strong> <%= serial %>
-                        </p>
+                        <p><strong>Total students:</strong> <%= serial %></p>
 
                         <button type="submit"
-                                class="btn btn-success"
+                                class="weekly-btn save-btn"
                                 onclick="return confirm('Save marks for Class <%= selectedClassNo %>?');">
                             Save All Marks
                         </button>
@@ -731,15 +806,14 @@
 
             </form>
         </section>
-
     <% } %>
 
     <!-- SECTION 3: SAVED WEEKLY-TEST RECORDS -->
-    <section class="weekly-section">
+    <section class="weekly-card">
 
-        <h2>③ Saved Weekly-Test Records</h2>
+        <h2 class="weekly-card-title">③ Saved Weekly-Test Records</h2>
 
-        <p class="section-description">
+        <p class="weekly-card-description">
             Select a class first, then choose a test to display only matching student records.
         </p>
 
@@ -749,7 +823,7 @@
               class="weekly-filter"
               id="savedRecordsFilter">
 
-            <div>
+            <div class="filter-field">
                 <label for="filterClass">Filter by class</label>
 
                 <select name="filterClass" id="filterClass">
@@ -768,7 +842,7 @@
                 </select>
             </div>
 
-            <div>
+            <div class="filter-field">
                 <label for="filterTestId">Filter by test</label>
 
                 <select name="filterTestId" id="filterTestId">
@@ -779,42 +853,36 @@
 
                     <% if (availableTests != null) {
                         for (String availableTest : availableTests) {
-
-                            String safeAvailableTest =
-                                    availableTest.replace("&", "&amp;")
-                                            .replace("\"", "&quot;")
-                                            .replace("<", "&lt;")
-                                            .replace(">", "&gt;");
+                            String safeAvailableTest = availableTest
+                                    .replace("&", "&amp;")
+                                    .replace("\"", "&quot;")
+                                    .replace("<", "&lt;")
+                                    .replace(">", "&gt;");
                     %>
-
                         <option value="<%= safeAvailableTest %>"
                             <%= availableTest.equals(filterTestId)
                                     ? "selected" : "" %>>
                             <%= safeAvailableTest %>
                         </option>
-
                     <%  }
                     } %>
                 </select>
             </div>
 
             <div>
-                <button type="submit" class="btn">
+                <button type="submit" class="weekly-btn">
                     Apply Filters
                 </button>
             </div>
-
         </form>
 
-        <p class="filter-count">
-            Displaying <strong><%= recordCount %></strong>
-            matching record(s).
+        <p class="record-count">
+            Displaying <strong><%= recordCount %></strong> matching record(s).
         </p>
 
-        <!-- FILTERED RECORDS TABLE -->
-        <div class="table-wrapper">
-
-            <table>
+        <!-- SAVED RECORDS TABLE -->
+        <div class="table-scroll">
+            <table class="weekly-table">
                 <thead>
                 <tr>
                     <th>Test Name</th>
@@ -828,22 +896,20 @@
                 </thead>
 
                 <tbody>
-
                 <% if (tests != null && !tests.isEmpty()) {
                     for (WeeklyTest t : tests) { %>
-
                     <tr>
-                        <td class="test-name-cell">
+                        <td class="test-name">
                             <%= t.getTestId() %>
                         </td>
 
                         <td>
-                            <span class="class-badge">
+                            <span class="class-pill">
                                 Class <%= t.getClassNo() %>
                             </span>
                         </td>
 
-                        <td class="student-name-cell">
+                        <td class="student-name">
                             <%= t.getStudentName() %>
                         </td>
 
@@ -854,77 +920,58 @@
                         </td>
 
                         <td>
-                            <span class="<%= t.getMarks() < 40
-                                    ? "fail-mark" : "pass-mark" %>">
+                            <span class="result-pill <%= t.getMarks() < 40
+                                    ? "result-fail" : "result-pass" %>">
                                 <%= t.getMarks() < 40 ? "FAIL" : "PASS" %>
                             </span>
                         </td>
 
                         <td>
                             <% if ("ADMIN".equals(user.getRole())) { %>
-
                                 <form action="${pageContext.request.contextPath}/weeklytest"
                                       method="post"
                                       class="delete-form"
                                       onsubmit="return confirm('Are you sure you want to delete this test record?');">
 
-                                    <input type="hidden"
-                                           name="action"
-                                           value="delete">
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="id" value="<%= t.getId() %>">
+                                    <input type="hidden" name="filterClass" value="<%= filterClass %>">
+                                    <input type="hidden" name="filterTestId" value="<%= filterTestId %>">
 
-                                    <input type="hidden"
-                                           name="id"
-                                           value="<%= t.getId() %>">
-
-                                    <input type="hidden"
-                                           name="filterClass"
-                                           value="<%= filterClass %>">
-
-                                    <input type="hidden"
-                                           name="filterTestId"
-                                           value="<%= filterTestId %>">
-
-                                    <button type="submit" class="btn btn-danger">
+                                    <button type="submit" class="delete-btn">
                                         Delete
                                     </button>
                                 </form>
-
                             <% } else { %>
-                                <span class="admin-only-label">Admin only</span>
+                                <span class="admin-only">Admin only</span>
                             <% } %>
                         </td>
                     </tr>
-
                 <%  }
                 } else { %>
-
                     <tr>
                         <td colspan="7" class="empty-records">
                             <strong>No weekly-test records found</strong>
                             Try selecting another class or test.
                         </td>
                     </tr>
-
                 <% } %>
-
                 </tbody>
             </table>
         </div>
 
     </section>
-
 </main>
 
 <script>
 (function () {
-    // Automatically apply saved-record filters when a selection changes.
     const filterForm = document.getElementById("savedRecordsFilter");
     const classFilter = document.getElementById("filterClass");
     const testFilter = document.getElementById("filterTestId");
 
     if (filterForm && classFilter && testFilter) {
         classFilter.addEventListener("change", function () {
-            // Reset test selection when the class changes.
+            // Reset the selected test when the class changes.
             testFilter.value = "all";
             filterForm.submit();
         });
@@ -934,7 +981,7 @@
         });
     }
 
-    // Update PASS/FAIL preview when marks are typed.
+    // Update the PASS/FAIL preview while entering marks.
     document.querySelectorAll(".student-mark").forEach(function (input) {
         input.addEventListener("input", function () {
             const row = this.closest("tr");
@@ -943,7 +990,6 @@
 
             if (value === "") {
                 cell.textContent = "—";
-                cell.className = "result-cell";
                 return;
             }
 
@@ -951,15 +997,14 @@
 
             if (marks < 0 || marks > 100) {
                 cell.textContent = "Enter 0–100";
-                cell.className = "result-cell fail-mark";
                 return;
             }
 
             const badge = document.createElement("span");
-            badge.className = marks < 40 ? "fail-mark" : "pass-mark";
+            badge.className = "result-pill " +
+                    (marks < 40 ? "result-fail" : "result-pass");
             badge.textContent = marks < 40 ? "FAIL" : "PASS";
 
-            cell.className = "result-cell";
             cell.replaceChildren(badge);
         });
     });
